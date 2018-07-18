@@ -1,0 +1,41 @@
+Package: DMRcompare
+Title: Compare Different R Tools for Detecting Differentially-Methylated Regions (DMRs) of a Genome
+Version: 0.0.0.9000
+Authors@R:
+    c(person("Lily", "Wang", email = "lily.wang@med.miami.edu", role = c("aut")),
+    person("Gabriel", "Odom", email = "gabriel.odom@med.miami.edu", role = c("aut", "cre")),
+    person("Steven", "Chen", email = "steven.chen@med.miami.edu", role = "aut"))
+Description: The accompanying package to the method comparison paper "An
+  evaluation of supervised methods for identifying differentially methylated
+  regions in epigenome-wide association studies" by Mallik et al. (2018),
+  submitted to Briefings in Bioinformatics as a review article. This package
+  contains the organized and documented R scripts necessary to replicate the
+  multi-design-point comparative simulation study, as well as associated tables
+  and figures.
+Depends:
+  R (>= 3.3.0),
+  ChAMPdata,
+  DMRcatedata
+Imports:
+  bumphunter,
+  ChAMP,
+  ChIPpeakAnno,
+  data.table,
+  doParallel,
+  DMRcate,
+  foreach,
+  GenomicRanges,
+  graphics,
+  grDevices,
+  IRanges,
+  minfi,
+  parallel,
+  PRROC,
+  stats
+License: GPL-2
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 6.0.1
+Suggests:
+  GEOquery,
+  testthat

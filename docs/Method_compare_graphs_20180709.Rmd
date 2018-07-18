@@ -1,0 +1,309 @@
+---
+title: "Method Comparison Graphs"
+author: "Gabriel J. Odom, PhD, ThD"
+date: "July 9, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Data Setup
+
+## Load Data and Packages
+```{r load, message = FALSE, warning = FALSE}
+library(DMRcompare)
+library(tidyverse)
+library(ggpubr)
+data("dmrcateRes_df")
+data("probeLassoRes_df")
+data("bumphunterRes_df")
+data("combpRes_df")
+```
+
+
+## Subset to the Best-Performing Cases
+```{r bestCases}
+results_ls <- list()
+results_ls$DMRcate <- 
+  dmrcateRes_df %>%  
+  filter(lambda == 500) %>% 
+  filter(C == 5) %>% 
+  mutate(method = paste0(method, "_lambda500_C5")) %>% 
+  select(-one_of("lambda", "C"))
+
+results_ls$ProbeLasso <- 
+  probeLassoRes_df %>% 
+  filter(adjPval == 0.05) %>% 
+  filter(mLassoRad == 1000) %>% 
+  filter(minDmrSep == 1000) %>% 
+  mutate(method = paste0(method, "_adjP0.05_mLassR1000")) %>% 
+  select(-one_of("adjPval", "mLassoRad", "minDmrSep"))
+
+results_ls$Bumphunter <- 
+  bumphunterRes_df %>% 
+  filter(cutoffQ == 0.95) %>% 
+  filter(maxGap == 250) %>% 
+  mutate(nCPG_q1 = as.character(nCPG_q1)) %>%
+  mutate(nCPG_med = as.character(nCPG_med)) %>%
+  mutate(nCPG_q3 = as.character(nCPG_q3)) %>% 
+  mutate(method = paste0(method, "_cutQ0.95_maxGap250")) %>% 
+  select(-one_of("cutoffQ", "maxGap"))
+
+results_ls$Comb_p <- 
+  combpRes_df %>% 
+  filter(combSeed == 0.05) %>% 
+  filter(combDist == 750) %>%
+  mutate(method = paste0(method, "_Seed0.05_Dist750")) %>% 
+  select(-one_of("combSeed", "combDist"))
+```
+
+
+## Clean and Join
+```{r cleanJoin}
+results_df <- 
+  results_ls %>% 
+  bind_rows() %>% 
+  filter(delta > 0) %>% 
+  mutate(nCPG_q1 = as.numeric(nCPG_q1)) %>%
+  mutate(nCPG_med = as.numeric(nCPG_med)) %>%
+  mutate(nCPG_q3 = as.numeric(nCPG_q3)) %>% 
+  mutate(method = factor(method)) %>% 
+  select(method, delta, seed, TP, FP, FN, power, precision,
+         AuPR, mcc, F1, nCPG_q1, nCPG_med, nCPG_q3)
+
+resultsAve_df <- 
+  results_df %>% 
+  group_by(method, delta) %>%
+  summarise(
+    TP       = mean(TP),
+    FP       = mean(FP),
+    FN       = mean(FN),
+    Pwr      = mean(power),
+    Precis   = mean(precision),
+    AuPR     = mean(AuPR),
+    MCC      = mean(mcc),
+    F1       = mean(F1),
+    nCPG_q1  = mean(nCPG_q1),
+    nCPG_med = mean(nCPG_med),
+    nCPG_q3  = mean(nCPG_q3)
+  )
+
+results_df %>% 
+  group_by(method) %>%
+  summarise(med_nCPGs = median(nCPG_med, na.rm = TRUE)) %>% 
+  knitr::kable()
+```
+
+
+# Figure 3: Power and Precision Plots by Delta
+
+## Power
+```{r powerXdelta}
+power_gg <- 
+  ggplot(data = resultsAve_df) + 
+  theme_bw() +
+  theme(panel.grid.minor = element_blank()) + 
+  aes(x = delta, y = Pwr, group = method, colour = method) + 
+  scale_y_continuous("Power", limits = c(0, 1)) +
+  scale_x_continuous("Treatment Effect",
+                     breaks = unique(results_df$delta),
+                     labels = prettyNum(unique(results_df$delta)),
+                     limits = c(0, 0.4)) +
+  ggtitle("Power under Best-Performing Parameter Set vs. Treatment Effect") + 
+  scale_color_discrete(name = "DMR Method",
+                       breaks = levels(results_df$method),
+                       labels = c("Bumphunter", "Comb-p",
+                                  "DMRcate", "ProbeLasso")) +
+  geom_line(size = 1)
+
+power_gg
+```
+
+
+## Precision
+```{r precisionXdelta, warning = FALSE}
+precis_gg <- 
+  ggplot(data = resultsAve_df) + 
+  theme_bw() +
+  theme(panel.grid.minor = element_blank()) + 
+  aes(x = delta, y = Precis, group = method, colour = method) + 
+  scale_y_continuous("Precision", limits = c(0.0, 1)) +
+  scale_x_continuous("Treatment Effect",
+                     breaks = unique(results_df$delta),
+                     labels = prettyNum(unique(results_df$delta)),
+                     limits = c(0, 0.4)) +
+  ggtitle("Precision under Best-Performing Parameter Set vs. Treatment Effect") + 
+  scale_color_discrete(name = "DMR Method",
+                       breaks = levels(results_df$method),
+                       labels = c("Bumphunter", "Comb-p",
+                                  "DMRcate", "ProbeLasso")) +
+  geom_line(size = 1)
+precis_gg
+```
+
+## Factor of Delta
+```{r deltaFct}
+nCPGsFct_df <-
+  resultsAve_df %>% 
+  mutate(delta = factor(delta,
+                        levels = unique(delta),
+                        ordered = TRUE))
+```
+
+## Figure 4: Side-by-Side Precision and Power
+```{r sideBYside}
+power2_gg <- 
+  ggplot(data = nCPGsFct_df) + 
+  theme_bw() +
+  theme(panel.grid.minor = element_blank()) + 
+  aes(x = delta, y = Pwr, group = method, colour = method) + 
+  scale_y_continuous("Power", limits = c(0, 1)) +
+  scale_x_discrete(expression(mu),
+                   breaks = unique(results_df$delta),
+                   labels = prettyNum(unique(results_df$delta))) +
+  scale_color_discrete(name = "DMR Method",
+                       breaks = levels(results_df$method),
+                       labels = c("Bumphunter", "Comb-p",
+                                  "DMRcate", "ProbeLasso")) +
+  ggtitle(" Power under Best-Performing \n Parameter Set vs. Treatment Effect") + 
+  geom_line(size = 1)
+
+precis2_gg <- 
+  ggplot(data = nCPGsFct_df) + 
+  theme_bw() +
+  theme(panel.grid.minor = element_blank()) + 
+  aes(x = delta, y = Precis, group = method, colour = method) + 
+  scale_y_continuous("Precision", limits = c(0, 1)) +
+  scale_x_discrete(expression(mu),
+                   breaks = unique(results_df$delta),
+                   labels = prettyNum(unique(results_df$delta))) +
+  ggtitle(" Precision under Best-Performing \n Parameter Set vs. Treatment Effect") + 
+  scale_color_discrete(name = "DMR Method",
+                       breaks = levels(results_df$method),
+                       labels = c("Bumphunter", "Comb-p",
+                                  "DMRcate", "ProbeLasso")) +
+  geom_line(size = 1)
+
+ggarrange(precis2_gg, power2_gg,
+          nrow = 1, ncol = 2,
+          common.legend = TRUE,
+          legend = "bottom")
+```
+
+
+# Box-and-Whiskers Plot of nCPGs
+```{r med_and_IQR_nCPGs, warning = FALSE}
+nCPGs_gg <-
+  ggplot(data = nCPGsFct_df) + 
+  theme_bw() +
+  aes(x = delta, group = method, colour = method) +
+  ggtitle("Median and IQR of DMR Sizes for Each Method under Optimal Parameter Settings") +
+  scale_color_discrete(name = "DMR Method",
+                       breaks = levels(nCPGsFct_df$method),
+                       labels = c("Bumphunter", "Comb-p",
+                                  "DMRcate", "ProbeLasso")) +
+  scale_x_discrete("Treatment Effect") + 
+  scale_y_continuous("Size of DMRs Detected") +
+  geom_errorbar(
+    mapping = aes(ymin = nCPG_q1, ymax = nCPG_q3),
+    position = position_dodge(width = 0.5),
+    width = 0.5,
+    size = 1
+  ) +
+  geom_point(
+    aes(y = nCPG_med),
+    position = position_dodge(width = 0.5),
+    size = 4
+  )
+
+nCPGs_gg
+```
+
+
+# Best-Case DMR Sizes
+
+## Read and Compile Data
+We will first read in the raw performance data for all four methods under their best-performing parameter setting. Zhen did not filter the original Comb-p results to `nCPGs`$ >= 5$, so we have to do that here.
+```{r read_data_raw, warning = FALSE}
+fileNames_char <- list.files("../extdata/best_cases_results")
+
+
+nCPGs_ls <- lapply(fileNames_char, function(name){
+  
+  # Metadata
+  name_char <- strsplit(name, split = "_")[[1]]
+  
+  # data
+  data_ls <- readRDS(paste0("../extdata/best_cases_results/", name))
+  data_df <- data_ls[[1]]
+  if(name_char[1] == "CombpResults"){
+    
+    data_df <- data_df[, c("chrom", "start", "end",
+                           "z_p", "n_probes")]
+    colnames(data_df) <- c("dmr.chr", "dmr.start", "dmr.end",
+                           "dmr.pval", "dmr.n.cpgs")
+    data_df <- data_df[data_df$dmr.n.cpgs > 4, ]
+    
+  } else {
+    data_df <- data_df[, c("dmr.chr", "dmr.start", "dmr.end",
+                           "dmr.pval", "dmr.n.cpgs")]
+  }
+  
+  # bind
+  data_df$method <- gsub(pattern = "Results", replacement = "", name_char[1])
+  data_df$delta  <- as.numeric(
+    gsub(pattern = "delta", replacement = "", name_char[2])
+  ) 
+  data_df$seed   <- as.numeric(
+    gsub(pattern = "seed", replacement = "", name_char[3])
+  )
+  
+  # return
+  data_df
+  
+})
+
+nCPGs_df <- 
+  nCPGs_ls %>% 
+  bind_rows() %>% 
+  select(delta, method, seed, everything()) %>% 
+  arrange(delta) %>% 
+  mutate(delta = factor(delta,
+                        levels = unique(delta),
+                        ordered = TRUE))
+nCPGs_df %>% 
+  group_by(method) %>%
+  summarise(med_nCPGs = median(dmr.n.cpgs, na.rm = TRUE)) %>% 
+  knitr::kable()
+```
+
+## Figure 6: Build Boxplot
+Now we have a data frame with the number of CPGs for each method by each design point. We use `theme_classic()` to pretty-up the hidden outliers; there are quite a instances where the ProbeLasso method returned large DMR sizes.
+```{r nCPGs_boxplot}
+ggplot(data = nCPGs_df) +
+  theme_classic() +
+  theme(legend.position = "bottom") +
+  aes(x = delta, y = dmr.n.cpgs, fill = method) +
+  ggtitle("DMR Sizes under Best-Performing Parameter Settings for Considered Methods") +
+  scale_y_continuous("Number of CpGs in Significant DMRs",
+                     limits = c(5, 25)) +
+  scale_x_discrete(expression(mu)) +
+  scale_fill_discrete("DMR Method") +
+  geom_boxplot(position = position_dodge(0.7),
+               width = 0.5,
+               outlier.color = "white")
+```
+
+## Violin Plot
+This shows the very long tail for ProbeLasso
+```{r nCPGs_violin}
+ggplot(data = nCPGs_df) +
+  theme_bw() + 
+  aes(x = delta, y = dmr.n.cpgs, fill = method) +
+  scale_y_continuous("Size of DMRs Detected") +
+  scale_x_discrete(expression(mu)) +
+  scale_fill_discrete("DMR Method") +
+  geom_violin()
+```

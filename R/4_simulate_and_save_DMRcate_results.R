@@ -1,0 +1,160 @@
+#' Calculate and Save DMRcate Method Results for Specified Design Points
+#'
+#' @description Given a set of design points, simulate appropriate DMR data and
+#'    apply the \code{dmrcate} method to them (with parameters also within the
+#'    design). Write the results to a file.
+#'
+#' @param beta_mat A matrix of beta values across genome on the array. This is
+#'    given in the \code{betaVals_mat} data set.
+#' @param CPGs_df A data frame matching chromosomes to CPG names and locations.
+#'    This data frame contains the variables \code{ILMNID}, \code{MAPINFO}, and
+#'    \code{chr} (e.g. \code{chr1}) and is given in the \code{cpgLocation_df}
+#'    data set.
+#' @param Aclusters_df A data frame of \code{Aclust} results. This is given in
+#'    the \code{startEndCPG_df} data set.
+#' @param parallel Should computing be completed over multiple computing cores?
+#'    Defaults to \code{TRUE}.
+#' @param numCores If \code{parallel}, how many cores should be used? Defaults
+#'    to two less than the number of available cores (as calculated by the
+#'    \code{\link[parallel]{detectCores}} function).
+#' @param deltas_num A vector of treatment sizes: non-negative real numbers to
+#'    add to the beta values within randomly-selected clusters for a single
+#'    class of subjects. This artifically creates differentially-methylated
+#'    regions (DMRs).
+#' @param seeds_int A vector of seed values passed to the
+#'    \code{\link[base]{Random}} function to enable reproducible results
+#' @param lambdas_num A vector of Gaussian kernel bandwidths for smoothed-
+#'    function estimation in the called \code{\link[DMRcate]{dmrcate}} function
+#' @param Cs_int A vector of scaling factors for bandwidth in the internal call
+#'    to the \code{\link[DMRcate]{dmrcate}} function
+#' @param resultsDir Where should the results be saved? Defaults to
+#'    \code{DMRcate_compare/}.
+#' @param verbose Should the function print progress messages? Defaults to
+#'    \code{TRUE} only if \code{parallel = FALSE}. See the internal
+#'    \code{\link{RunDMRcate}} function for more details about parallel
+#'    computing with DMRcate.
+#'
+#' @return Nothing. Saves output to a file in the specified results directory.
+#'
+#' @details This function creates matrices of all combinations of design points
+#'    and all combinations of parameters. For each combination, this function
+#'    executes the internal \code{\link{RunDMRcate}} function and saves the
+#'    results as a compressed \code{.RDS} file.
+#'
+#' @importFrom doParallel registerDoParallel
+#' @importFrom foreach foreach
+#' @importFrom foreach %dopar%
+#' @importFrom parallel detectCores
+#' @importFrom parallel makeCluster
+#' @importFrom parallel stopCluster
+#'
+#'
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#'    data("betaVals_mat")
+#'    data("cpgLocation_df")
+#'    data("startEndCPG_df")
+#'
+#'    WriteDMRcateResults(
+#'      beta_mat = betaVals_mat,
+#'      CPGs_df = cpgLocation_df,
+#'      Aclusters_df = startEndCPG_df
+#'    )
+#' }
+WriteDMRcateResults <- function(beta_mat,
+                                CPGs_df,
+                                Aclusters_df,
+                                parallel = TRUE,
+                                numCores = detectCores() - 2,
+                                deltas_num = c(0, 0.025, 0.05, 0.10,
+                                               0.15, 0.20, 0.30, 0.40),
+                                seeds_int = c(100, 210, 330, 450, 680),
+                                lambdas_num = c(200, 250, 500, 750, 1000),
+                                Cs_int = 1:5,
+                                resultsDir = "DMRcate_compare/",
+                                verbose = !parallel){
+
+  dir.create(paste0("./", resultsDir), showWarnings = FALSE)
+
+  ###  Data Simulation Outer Loop  ###
+  designPts_mat <- expand.grid(deltas_num, seeds_int)
+  paramsGrid_mat <- expand.grid(lambdas_num, Cs_int)
+
+  for(i in 1:nrow(designPts_mat)){
+
+    ###  Generate Data Set  ###
+    delta <- designPts_mat[i, 1]
+    seed  <- designPts_mat[i, 2]
+
+    treatment_ls <- SimulateData(beta_mat = beta_mat,
+                                 AclustCPG_df = Aclusters_df,
+                                 delta_num = delta,
+                                 seed_int = seed)
+    betas_df <- treatment_ls$simBetaVals_df
+
+    ###  Parallel Setup  ###
+    if(!parallel){
+      numCores <- 1
+    }
+    clust <- makeCluster(numCores)
+    registerDoParallel(clust)
+
+
+    ###  Inner Parameter Grid Search  ###
+    foreach(j = 1:nrow(paramsGrid_mat),
+            .packages = c("DMRcompare", "data.table")) %dopar% {
+
+              ###  Calculate Method Output  ###
+              lambda <- paramsGrid_mat[j, 1]
+              C_int  <- paramsGrid_mat[j, 2]
+
+              suppressMessages(
+                res_ls <- RunDMRcate(betaVals_mat = betas_df,
+                                     cpgLocation_df = CPGs_df,
+                                     lambda_int = lambda,
+                                     C_int = C_int)
+              )
+
+              ###  Define NULL Data  ###
+              if(is.null(res_ls[[1]])){
+                res_ls[[1]] <- data.frame(
+                  dmr.chr    = NA,
+                  dmr.start  = NA_integer_,
+                  dmr.end    = NA_integer_,
+                  seqnames   = NA,
+                  start      = NA_integer_,
+                  end        = NA_integer_,
+                  width      = NA_integer_,
+                  strand     = NA,
+                  no.cpgs    = NA_integer_,
+                  minfdr     = NA_real_,
+                  Stouffer   = NA_real_,
+                  maxbetafc  = NA_real_,
+                  meanbetafc = NA_real_,
+                  overlapping.promoters = NA_character_,
+                  dmr.pval   = NA_real_,
+                  dmr.n.cpgs = NA_integer_
+                )
+              }
+
+              ###  Save Results  ###
+              file_char <- paste0(
+                resultsDir, "DMRcateResults_delta", delta, "_seed", seed,
+                "_lambda", lambda, "_C", C_int, ".RDS"
+              )
+
+              if(verbose){
+                message("Saving results to file ", file_char, "\n")
+              }
+
+              saveRDS(res_ls, file = file_char)
+
+            } # END for(j)
+
+    stopCluster(clust)
+
+  } # END for(i)
+
+}
