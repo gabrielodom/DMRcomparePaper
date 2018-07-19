@@ -10,213 +10,275 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# 1. Load and Inspect the Results
-## 1.1 Select Columns of Interest
-For all four of the data sets, we can remove some of the superfluous results columns. We will retain the following columns: power, AuPR, precision, MCC, F1-score, effect size, random seed, quartiles of the number of CPGs retained at each design point and parameter point interaction, and the model parameters.
-```{r trimCols, warning = FALSE}
-resultsDMRcate_df <-
-  dmrcateRes_df %>%
-  select(power, AuPR, precision, mcc, F1,
-         lambda, C,
-         delta, seed, nCPG_med, nCPG_q3) %>%
-  mutate(nCPG_med = as.numeric(nCPG_med)) %>%
-  mutate(nCPG_q3 = as.numeric(nCPG_q3))
-
-resultsPL_df <-
-  probeLassoRes_df %>%
-  select(power, AuPR, precision, mcc, F1,
-         adjPval, mLassoRad, minDmrSep,
-         delta, seed, nCPG_med, nCPG_q3) %>%
-  mutate(nCPG_med = as.numeric(nCPG_med)) %>%
-  mutate(nCPG_q3 = as.numeric(nCPG_q3))
-
-resultsBump_df <-
-  bumphunterRes_df %>%
-  select(power, AuPR, precision, mcc, F1,
-         cutoffQ, maxGap,
-         delta, seed, nCPG_med, nCPG_q3) %>%
-  mutate(nCPG_med = as.numeric(nCPG_med)) %>%
-  mutate(nCPG_q3 = as.numeric(nCPG_q3))
-
-resultsComb_df <-
-  combpRes_df %>%
-  select(power, AuPR, precision, mcc, F1,
-         combSeed, combDist,
-         delta, seed, nCPG_med, nCPG_q3) %>%
-  mutate(nCPG_med = as.numeric(nCPG_med)) %>%
-  mutate(nCPG_q3 = as.numeric(nCPG_q3))
+# Load and Inspect the Results
+We have saved the tabulated results files for each method in the `DMRcompare` package. We will use the `tidyverse` package suite for data management utility. Access these via
+```{r load, message = FALSE, warning = FALSE}
+library(DMRcompare)
+library(tidyverse)
+data("dmrcateRes_df")
+data("probeLassoRes_df")
+data("bumphunterRes_df")
+data("combpRes_df")
 ```
 
-## 1.2 Omit Missing Values
-These data sets have missing values for many of the performance metrics with no treatment effect. We will remove all experiments with missing values.
-```{r NAomit}
-resultsDMRcate_df <- resultsDMRcate_df[complete.cases(resultsDMRcate_df), ]
-resultsPL_df      <- resultsPL_df[complete.cases(resultsPL_df), ]
-resultsBump_df    <- resultsBump_df[complete.cases(resultsBump_df), ]
-resultsComb_df    <- resultsComb_df[complete.cases(resultsComb_df), ]
-```
-
-
-# 2 Spearman Correlations
-Now that we have some clean data, we can inspect correlations between the different performance metrics and between model accuracy and parameter value.
-
-## 2.1 Correlation Between Performance Metrics
-We will now consider the Spearman correlation between AuPR and MCC and AuPR and the F1-score for each method.
-```{r spearCorrs, echo = FALSE, warning = FALSE}
-DMRc_cor <- cor(resultsDMRcate_df, method = "spearman")
-pl_cor   <- cor(resultsPL_df, method = "spearman")
-bump_cor <- cor(resultsBump_df, method = "spearman")
-comb_cor <- cor(resultsComb_df, method = "spearman")
-
-perfCorrs_df <- data.frame(
-  DMRcate    = DMRc_cor[2, 4:5],
-  ProbeLasso = pl_cor[2, 4:5],
-  Bumphunter = bump_cor[2, 4:5],
-  Comb_p     = comb_cor[2, 4:5]
+These data frames all contain the following common elements:
+```{r commonNames}
+commonNames_char <- Reduce(
+  intersect,
+       list(colnames(dmrcateRes_df),
+          colnames(probeLassoRes_df),
+          colnames(bumphunterRes_df),
+          colnames(combpRes_df))
 )
-rownames(perfCorrs_df) <- c("Cor(AuPR, MCC)", "Cor(AuPR, F1)")
-
-library(knitr)
-kable(perfCorrs_df)
+commonNames_char
 ```
 
-Notice that for all methods, except for Bumphunter, the information conveyed by AuPR is nearly identical to that of the MCC or F1-score measures.
+##  Common Columns
+The common elements of interest are
 
-## 2.2 Correlation Between Parameters and Performance
-Which parameters for each method have the strongest relationships with performance?
-```{r spearParamCorrs, echo = FALSE}
-SpearmanParam <- function(res_num, params_df, method_char){
-  
-  paramNames <- colnames(params_df)
-  out_ls <- lapply(1:ncol(params_df), function(x){
-    
-    suppressWarnings(
-      spear_ls <- cor.test(res_num, params_df[, x], method = "spearman")
-    )
-    
-    inner_df <- data.frame(
-      Method = method_char,
-      Parameter = paramNames[x],
-      Correlation = spear_ls$estimate,
-      pValue = spear_ls$p.value,
-      stringsAsFactors = FALSE
-    )
-    rownames(inner_df) <- NULL
-    inner_df
-    
-  })
-  
-  bind_rows(out_ls)
-}
+- Performance metrics: false negatives (`FN`), false positives (`FP`), true negatives (`TN`), true positives (`TP`), power, the sample size used to calculate power (`nPower`), the area under the precision-recall curve (`AuPR`), precision false positives (`FPprecis`), precision true positives (`TPprecis`), precision, the sample size used to calculate precision (`nPrecis`), Matthews Correlation Coefficient (`mcc`), and the F1-score (`F1`). Because many of these performance metric are related to each other arithmetically, we will reduce our inspection set to AuPR, MCC, and F1.
+- Parameters: the DMR-detection method used (`method`), the simulated effect size (`delta`), and the random seed to ensure reproducibility (`seed`).
 
-dfs_ls <- list()
-dfs_ls[[1]] <- SpearmanParam(resultsDMRcate_df$AuPR,
-                              resultsDMRcate_df[, 6:7],
-                              "DMRcate")
-dfs_ls[[2]] <- SpearmanParam(resultsPL_df$AuPR,
-                            resultsPL_df[, 6:8],
-                            "ProbeLasso")
-dfs_ls[[3]] <- SpearmanParam(resultsBump_df$AuPR,
-                              resultsBump_df[, 6:7],
-                              "Bumphunter")
-dfs_ls[[4]] <- SpearmanParam(resultsComb_df$AuPR,
-                              resultsComb_df[, 6:7],
-                              "Comb-p")
-spearmanCorrs_df <- bind_rows(dfs_ls)
-# write_csv(spearmanCorrs_df, path = "../resultsData/spearmanCorrs.csv")
-kable(spearmanCorrs_df)
+## Method-Specific Columns
+The method-specific parameters are
+
+- DMRcate: `lambda` and `C`
+```{r dmrcateParams}
+setdiff(colnames(dmrcateRes_df), commonNames_char)
 ```
-
-###  More Detail on Bumphunter
-We may also care to inspect the Bumphunter results in more detail: recall that the MCC and F1-score measures were not as highly correlated with AuPR for this method. We first tabulate Bumphunter's parameter effects on MCC.
-```{r bumphunterCorrs1, echo=FALSE}
-kable(SpearmanParam(resultsBump_df$mcc,
-              resultsBump_df[, 6:7],
-              "Bumphunter"))
+- ProbeLasso: `adjPval`, `mLassoRad`, and `minDmrSep`
+```{r plParams}
+setdiff(colnames(probeLassoRes_df), commonNames_char)
 ```
-
-Now we inspect Bumphunter's parameter effects on the F1-score.
-```{r bumphunterCorrs2, echo=FALSE}
-kable(SpearmanParam(resultsBump_df$F1,
-              resultsBump_df[, 6:7],
-              "Bumphunter"))
+- Bumphunter: `cutoffQ` and `maxGap`
+```{r bumpParams}
+setdiff(colnames(bumphunterRes_df), commonNames_char)
+```
+- Comb-p: `combSeed` and `combDist`
+```{r combParams}
+setdiff(colnames(combpRes_df), commonNames_char)
 ```
 
 
-# 3 Best Parameter Settings
-Now we will inspect which parameter settings yield the best AuPR values (averaged over each replicate) for each method. We will first trim each results data frame down to the AuPR, effect size, and parameters. We will also remove the design points with no effect.
-```{r trimCols2}
-resDMRc2_df <- 
-  resultsDMRcate_df %>% 
-  select(AuPR, delta, lambda, C) %>% 
-  filter(delta > 0)
+# Table of All Parameter Settings
+We finally have need for the supplemental tables of all performance metrics for all tested parameter settings under each `delta` while averaged over each seed.
 
-resPL2_df <- 
-  resultsPL_df %>% 
-  select(AuPR, delta, adjPval, mLassoRad, minDmrSep) %>% 
-  filter(delta > 0)
-
-resBump2_df <- 
-  resultsBump_df %>% 
-  select(AuPR, delta, cutoffQ, maxGap) %>% 
-  filter(delta > 0)
-
-resComb2_df <- 
-  resultsComb_df %>% 
-  select(AuPR, delta, combSeed, combDist) %>% 
-  filter(delta > 0)
-```
-
-## 3.1 DMRcate
-Now we can find the best DMRcate parameter settings for each value of $\delta$.
-```{r bestDMRcateParams}
-resDMRc2_df %>%
+## DMRcate
+This table shows the average performance of the DMRcate method at each $\delta > 0$.
+```{r allDMRcateParams}
+dmrcate_tab <-
+  dmrcateRes_df %>%
+  select(delta, seed, lambda, C,
+         TP, FP, FN, power, precision, AuPR, mcc, F1) %>% 
+  filter(delta > 0) %>% 
   group_by(delta, lambda, C) %>%
-  summarise(AuPR_ave = mean(AuPR)) %>%
-  group_by(delta) %>% 
-  filter(AuPR_ave == max(AuPR_ave)) %>% 
+  summarise(
+    TP     = CalcMeanSD(TP, sigFigsMean = 0),
+    FP     = CalcMeanSD(FP, sigFigsMean = 0),
+    FN     = CalcMeanSD(FN, sigFigsMean = 0),
+    Pwr    = CalcMeanSD(power),
+    Precis = CalcMeanSD(precision),
+    AuPR   = CalcMeanSD(AuPR),
+    MCC    = CalcMeanSD(mcc),
+    F1     = CalcMeanSD(F1)
+  )
+
+# write_csv(dmrcate_tab, path = "../resultsData/DMRcate_total_results.csv")
+dmrcate_tab %>% 
   kable()
 ```
 
-This table shows that smaller values of `lambda` paired with larger values of `C` often yield the best results. According to the `dmrcate` help documentation, the ratio of `lambda` and `C` yield the $\sigma$ parameter, and we believe that smaller values of this ratio yield more accurate results.
 
+## ProbeLasso
+This table shows the average performance of the ProbeLasso method at each $\delta > 0$.
+```{r allPLParams}
+pl_tab <-
+  probeLassoRes_df %>%
+  select(delta, seed, adjPval, mLassoRad, minDmrSep,
+         TP, FP, FN, power, precision, AuPR, mcc, F1) %>% 
+  filter(delta > 0) %>% 
+  group_by(delta, adjPval, mLassoRad, minDmrSep) %>%
+  summarise(
+    TP     = CalcMeanSD(TP, sigFigsMean = 0),
+    FP     = CalcMeanSD(FP, sigFigsMean = 0),
+    FN     = CalcMeanSD(FN, sigFigsMean = 0),
+    Pwr    = CalcMeanSD(power),
+    Precis = CalcMeanSD(precision),
+    AuPR   = CalcMeanSD(AuPR),
+    MCC    = CalcMeanSD(mcc),
+    F1     = CalcMeanSD(F1)
+  )
 
-## 3.2 ProbeLasso
-Now we can find the best ProbeLasso parameter settings for each value of $\delta$.
-```{r bestProbeLassoParams}
-resPL2_df %>%
-  group_by(delta, adjPval, mLassoRad) %>%
-  summarise(AuPR_ave = mean(AuPR)) %>%
-  group_by(delta) %>% 
-  filter(AuPR_ave == max(AuPR_ave)) %>% 
+# write_csv(pl_tab, path = "../resultsData/ProbeLasso_total_results.csv")
+pl_tab %>% 
   kable()
 ```
 
-As expected, larger values of the `meanLassoRadius` yield better AuPRs. What we did not expect was that the larger `adjPval` values also increased the AuPR. We have seen that smaller values of `adjPval` increased the effect of the `meanLassoRadius` parameter. Also, we removed the `minDmrSep` parameter from this table because it had no effect and created many ties (increasing the number of rows in this table without adding new information). We tried `minDmrSep = 200, 250, 500, 750, 1000`, and all five values yielded equal (to the thousandth place) AuPR values.
 
-## 3.3 Bumphunter
-Now we can find the best Bumphunter parameter settings for each value of $\delta$.
-```{r bestBumphunterParams}
-resBump2_df %>%
+## Bumphunter
+This table shows the average performance of the Bumphunter method at each $\delta > 0$.
+```{r allBumphunterParams}
+bump_tab <-
+  bumphunterRes_df %>%
+  select(delta, seed, cutoffQ, maxGap,
+         TP, FP, FN, power, precision, AuPR, mcc, F1) %>% 
+  filter(delta > 0) %>% 
   group_by(delta, cutoffQ, maxGap) %>%
-  summarise(AuPR_ave = mean(AuPR)) %>%
-  group_by(delta) %>% 
-  filter(AuPR_ave == max(AuPR_ave)) %>% 
+  summarise(
+    TP     = CalcMeanSD(TP, sigFigsMean = 0),
+    FP     = CalcMeanSD(FP, sigFigsMean = 0),
+    FN     = CalcMeanSD(FN, sigFigsMean = 0),
+    Pwr    = CalcMeanSD(power),
+    Precis = CalcMeanSD(precision),
+    AuPR   = CalcMeanSD(AuPR),
+    MCC    = CalcMeanSD(mcc),
+    F1     = CalcMeanSD(F1)
+  )
+
+# write_csv(bump_tab, path = "../resultsData/Bumphunter_total_results.csv")
+bump_tab %>% 
   kable()
 ```
 
-We saw in our preliminary results that `cutoffQ = 0.99` yielded poorer results, on average, so these results pertaining to the `cutoffQ` parameter do not surprise us. Further, we did not find any relationship between AuPR and the `maxGap` parameter in our preliminary work. If anything, we might take away that the smaller values of `maxGap` seem to fare better, and that `maxGap` should increase with effect size (data sets with stronger signal may need an increase in `maxGap` for best DMR-detection results).
 
-
-## 3.4 Comb-p
-Now we can find the best Comb-p parameter settings for each value of $\delta$.
-```{r bestCombpParams}
-resComb2_df %>%
+## Comb-p
+This table shows the average performance of the Comb-p method at each $\delta > 0$.
+```{r allCombpParams}
+comb_tab <-
+  combpRes_df %>%
+  select(delta, method, seed, combSeed, combDist,
+         TP, FP, FN, power, precision, AuPR, mcc, F1, time) %>% 
+  filter(delta > 0) %>% 
   group_by(delta, combSeed, combDist) %>%
-  summarise(AuPR_ave = mean(AuPR)) %>%
-  group_by(delta) %>% 
-  filter(AuPR_ave == max(AuPR_ave)) %>% 
+  summarise(
+    method = "Comb-p",
+    TP     = CalcMeanSD(TP, sigFigsMean = 0),
+    FP     = CalcMeanSD(FP, sigFigsMean = 0),
+    FN     = CalcMeanSD(FN, sigFigsMean = 0),
+    Pwr    = CalcMeanSD(power),
+    Precis = CalcMeanSD(precision),
+    AuPR   = CalcMeanSD(AuPR),
+    MCC    = CalcMeanSD(mcc),
+    F1     = CalcMeanSD(F1),
+    time   = CalcMeanSD(time, sigFigsMean = 0)
+  )
+
+# write_csv(comb_tab, path = "../resultsData/Combp_total_results.csv")
+comb_tab %>% 
+  select(-method) %>% 
   kable()
 ```
 
-Once again, these results are in line with our preliminary expectations: the `combDist` parameter drives the AuPR results much more than the `combSeed` parameter. It seems that larger values of `combDist` are better, although the size may need to taper off when Comb-p is applied to data sets with strong signal. In our previous work, we found no effect on AuPR from the `combSeed` parameter, but we can keep it larger to be safe.
+
+# Table of Best-Performing Parameters
+
+## DMRcate
+This method shows best performance with `lambda = 500` and `C = 5`.
+```{r Table3_bestPerformance1}
+resDMRc3_df <- 
+  dmrcate_tab %>% 
+  filter(lambda == 500) %>% 
+  filter(C == 5) %>% 
+  ungroup() %>% 
+  select(-one_of("lambda", "C"))
+DMRcTimes_df <-
+  lilyCompTimes_df %>% 
+  filter(Method == "DMRcate") %>% 
+  mutate(time = paste0(round(Mean, 0), " (", round(StdDev, 2), ")")) %>% 
+  select(-one_of("Mean", "StdDev")) %>% 
+  rename("delta" = "Delta")
+
+res3_ls$DMRcate <-
+  resDMRc3_df %>%
+  left_join(DMRcTimes_df, by = "delta") %>% 
+  select(delta, Method, everything())
+
+res3_ls$DMRcate %>% 
+  select(-Method) %>% 
+  kable()
+```
+
+
+## ProbeLasso
+This method shows best performance with `adjPvalProbe = 0.05` and `meanLassoRadius = 1000`. The `minDmrSep` parameter had no discernable effect, so we left this parameter at its default value.
+```{r Table3_bestPerformance2}
+resPL3_df <- 
+  pl_tab %>% 
+  filter(adjPval == 0.05) %>% 
+  filter(mLassoRad == 1000) %>% 
+  filter(minDmrSep == 1000) %>% 
+  ungroup() %>% 
+  select(-one_of("adjPval", "mLassoRad", "minDmrSep"))
+PLtimes_df <- 
+  lilyCompTimes_df %>% 
+  filter(Method == "ProbeLasso") %>% 
+  mutate(time = paste0(round(Mean, 0), " (", round(StdDev, 2), ")")) %>% 
+  select(-one_of("Mean", "StdDev")) %>% 
+  rename("delta" = "Delta")
+
+res3_ls$ProbeLasso <- 
+  resPL3_df %>%
+  left_join(PLtimes_df, by = "delta") %>% 
+  select(delta, Method, everything())
+
+res3_ls$ProbeLasso %>% 
+  select(-Method) %>% 
+  kable()
+```
+
+
+## Bumphunter
+This method shows best performance with `pickCutoffQ = 0.95` and `maxGap = 250`.
+```{r Table3_bestPerformance3}
+resBump3_df <- 
+  bump_tab %>% 
+  filter(cutoffQ == 0.95) %>% 
+  filter(maxGap == 250) %>% 
+  ungroup() %>% 
+  select(-one_of("cutoffQ", "maxGap"))
+BumpTimes_df <-
+  lilyCompTimes_df %>% 
+  filter(Method == "Bumphunter") %>% 
+  mutate(time = paste0(round(Mean, 0), " (", round(StdDev, 2), ")")) %>% 
+  select(-one_of("Mean", "StdDev")) %>% 
+  rename("delta" = "Delta")
+
+res3_ls$Bumphunter <- 
+  resBump3_df %>%
+  left_join(BumpTimes_df, by = "delta") %>% 
+  select(delta, Method, everything())
+
+res3_ls$Bumphunter %>% 
+  select(-Method) %>% 
+  kable()
+```
+
+
+## Comb-p
+This method shows best performance with `seed = 0.05` and `dist = 750`.
+```{r Table3_bestPerformance4}
+res3_ls$Comb_p <- 
+  comb_tab %>% 
+  rename("Method" = "method") %>% 
+  ungroup() %>% 
+  filter(combSeed == 0.05) %>% 
+  filter(combDist == 750) %>% 
+  select(-one_of("combSeed", "combDist"))
+  
+res3_ls$Comb_p %>% 
+  select(-Method) %>% 
+  kable()
+```
+
+
+## Save Combined Table
+```{r combine_bests}
+res3_df <-
+  res3_ls %>% 
+  bind_rows() %>% 
+  arrange(delta)
+
+# write_csv(res3_df, path = "../resultsData/Best_params_results.csv")
+res3_df %>% 
+  kable()
+```
