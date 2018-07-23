@@ -1,5 +1,5 @@
 Package: DMRcompare
-Title: Compare Different R Tools for Detecting Differentially-Methylated Regions (DMRs) of a Genome
+Title: Comparing Different Analytical Tools for Identifying Differentially Methylated Regions (DMRs) in Illumina Methylation Arrays
 Version: 0.0.0.9000
 Authors@R:
     c(person("Lily", "Wang", email = "lily.wang@med.miami.edu", role = c("aut")),
@@ -7,11 +7,10 @@ Authors@R:
     person("Steven", "Chen", email = "steven.chen@med.miami.edu", role = "aut"))
 Description: The accompanying package to the method comparison paper "An
   evaluation of supervised methods for identifying differentially methylated
-  regions in epigenome-wide association studies" by Mallik et al. (2018),
+  regions in Illumina methylation arrays" by Mallik et al. (2018),
   submitted to Briefings in Bioinformatics as a review article. This package
-  contains the organized and documented R scripts necessary to replicate the
-  multi-design-point comparative simulation study, as well as associated tables
-  and figures.
+  contains the R scripts for simulation study and associated tables
+  and figures in the manuscript.
 Depends:
   R (>= 3.3.0),
   ChAMPdata,
