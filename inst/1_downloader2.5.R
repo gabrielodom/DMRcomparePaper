@@ -3,6 +3,9 @@
 # Gabriel Odom (editor)
 # 2018
 
+##### Summary - This script was used to download methylation datasets from GEO -------------------------------
+
+
 # source("http://bioconductor.org/biocLite.R")
 # biocLite("GEOquery")
 
