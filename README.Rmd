@@ -15,15 +15,27 @@ knitr::opts_chunk$set(
 ```
 
 # DMRcompare
-This project contains analysis scripts used in the manuscript "An Evaluation of Supervised Methods for Identifying Differentially Methylated Regions in Illumina Methylation Arrays" by Mallik et al. The manual files for all functions in this project is in `docs/DMRcompare.pdf`.
+This project contains analysis scripts used in the manuscript "An Evaluation of Supervised Methods for Identifying Differentially Methylated Regions in Illumina Methylation Arrays" by Mallik et al. The reference files for all functions  in this project is in `/docs/DMRcompare.pdf`. 
 
 ### I. Download Public Methylation Dataset GSE41169
 
-- `inst/1_downloader2.5.R`
+File: `/inst/1_downloader2.5.R`
+
+Input: GEO accession number, criteria for selecting methylation datasets
+
+Output: beta value matrix for selected methylation datasets (rows = cpg ids, column = sample numbers)
+
 
 ### II. Perform Adjacent Site Clustering to Obtain Clusters of Adjacent CpG Probes (A-clusters)
 
-- `inst/1_Aclust_data_import.R`
+The A-clustering algorithm described in Sofer et al. (2011) was used identifying clusters of adjacent CpGs. 
+
+File: `/inst/1_Aclust_data_import.R`
+
+Input: beta value matrix, annotation file that indicates locations of CpGs
+
+Output: startEndCPG_df (file indicating clusters of CpGs, an example file is at )
+
 
 ### III. Simulation Study
 
