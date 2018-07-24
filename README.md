@@ -26,7 +26,7 @@ Output: startEndCPG\_df, which is beta value matrix for clusters of CpGs. This f
 
 There are three main steps in the simulation study. See `/docs/DMRcompare.pdf` for details of each function described below.
 
-1.  Simulate differentially methylated clusters of CpGs.
+**1. Simulate differentially methylated clusters of CpGs.**
 
 File: - `SimulateData()` in script file `R/2_simulatedata.R`
 
@@ -34,13 +34,13 @@ Main Input: `betaVals_mat`, `startEndCpG_df` file that indicates clusters of CpG
 
 Main OUtput: simulated beta value matrix, where treatment effects were added to 500 randomly selected clusters of CpGs
 
-1.  Apply DMR finding methods to the simulated datasets:
+**2. Apply DMR finding methods to the simulated datasets**
 
 Files: - `RunBumphunter()` in script file `R/3_RunBumphunter.R` - `RunDMRcate()` in script file `R/3_RunDMRcate.R` - `RunProbeLasso()` in script file `R/3_RunProbeLasso.R` - The `Comb-p` method was implemented in `Python`. The corresponding shell script is `exec/run_combp_working1.sh`
 
-Main output: significant DMRs identified by each of the methods
+Main output: significant DMRs identified by each of the methods\*\*
 
-1.  Summarize results of DMR finding methods:
+**3. Summarize results of DMR finding methods**
 
 Files: - `ProcessBumphunterResults()` in script file `R/5_read_and_summarize_Bumphunter_results.R` - `ProcessDMRcateResults()` in script file `R/5_read_and_summarize_DMRcate_results.R` - `ProcessProbeLassoResults()` in script file `R/5_read_and_summarize_ProbeLasso_results.R` - `ProcessCombpResults()` in script file `R/5_standardize_and_summarize_Comb-p_results.R`
 
