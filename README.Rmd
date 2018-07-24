@@ -21,32 +21,35 @@ This project contains analysis scripts used in the manuscript "An Evaluation of 
 
 File: `/inst/1_downloader2.5.R`
 
-Input: GEO accession number, criteria for selecting methylation datasets
+Input: GEO accession number, criteria for selecting methylation datasets.
 
-Output: beta value matrix for selected methylation datasets (rows = cpg ids, column = sample numbers)
+Output: beta value matrix for selected methylation samples. This file has rows = cpg ids, columns = sample ids.  An example file is at `/data/betaVals_mat.csv`.
 
 
 ### II. Perform Adjacent Site Clustering to Obtain Clusters of Adjacent CpG Probes (A-clusters)
 
-The A-clustering algorithm described in Sofer et al. (2011) was used identifying clusters of adjacent CpGs. 
+The A-clustering algorithm described in Sofer et al. (2011) was used to identify clusters of adjacent CpGs. 
 
 File: `/inst/1_Aclust_data_import.R`
 
-Input: beta value matrix, annotation file that indicates locations of CpGs
+Input: (1) beta value matrix, (2) annotation file that indicates locations of CpGs. This file has rows = cpg ids, columns = chromosome, location. An example file is at `/data/cpgLocation_df.csv`. 
 
-Output: startEndCPG_df (file indicating clusters of CpGs, an example file is at )
+Output: startEndCPG_df, which is beta value matrix for clusters of CpGs. This file has rows = cpg ids, columns = cluster number, chr, start of cluster, end of cluster, sample ids. An example file is at `/data/startEndCpG_df.csv`.
 
 
 ### III. Simulation Study
+
+Three main functions was used: 
 
 - `WriteBumphunterResults()` in script file `R/4_simulate_and_save_Bumphunter_results.R`
 - `WriteDMRcateResults()` in script file `R/4_simulate_and_save_DMRcate_results.R`
 - `WriteProbeLassoResults()` in script file `R/4_simulate_and_save_ProbeLasso_results.R`
 
-The three functions listed above call different functions during each step of the simulation study:
+Each function listed above calls the functions below during each step of the simulation study:
 
 a) Simulate differentially methylated clusters of CpGs:
     - `SimulateData()` in script file `R/2_simulatedata.R`
+    
 b) Apply DMR finding methods to the simulated datasets:
     - `RunBumphunter()` in script file `R/3_RunBumphunter.R`
     - `RunDMRcate()` in script file `R/3_RunDMRcate.R`
