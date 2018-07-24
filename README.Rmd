@@ -23,7 +23,7 @@ File: `/inst/1_downloader2.5.R`
 
 Input: GEO accession number, criteria for selecting methylation datasets.
 
-Output: beta value matrix for selected methylation samples. This file has rows = cpg ids, columns = sample ids.  An example file is at `/data/betaVals_mat.csv`.
+Output: `betaVals_mat`, which is beta value matrix for selected methylation samples. This file has rows = cpg ids, columns = sample ids.  An example file is at `/data/betaVals_mat.csv`.
 
 
 ### II. Perform Adjacent Site Clustering to Obtain Clusters of Adjacent CpG Probes (A-clusters)
@@ -32,34 +32,50 @@ The A-clustering algorithm described in Sofer et al. (2011) was used to identify
 
 File: `/inst/1_Aclust_data_import.R`
 
-Input: (1) beta value matrix, (2) annotation file that indicates locations of CpGs. This file has rows = cpg ids, columns = chromosome, location. An example file is at `/data/cpgLocation_df.csv`. 
+Input: (1) `betaVals_mat`, which is beta value matrix of all cpgs on the array; (2) `cpgLocation_df`, which is annotation file that indicates locations of CpGs. This file has rows = cpg ids, columns = chromosome, location. An example file is at `/data/cpgLocation_df.csv`. 
 
 Output: startEndCPG_df, which is beta value matrix for clusters of CpGs. This file has rows = cpg ids, columns = cluster number, chr, start of cluster, end of cluster, sample ids. An example file is at `/data/startEndCpG_df.csv`.
 
 
 ### III. Simulation Study
 
-Three main functions was used: 
+There are three main steps in the simulation study. See `/docs/DMRcompare.pdf` for details of each function.  
 
-- `WriteBumphunterResults()` in script file `R/4_simulate_and_save_Bumphunter_results.R`
-- `WriteDMRcateResults()` in script file `R/4_simulate_and_save_DMRcate_results.R`
-- `WriteProbeLassoResults()` in script file `R/4_simulate_and_save_ProbeLasso_results.R`
-
-Each function listed above calls the functions below during each step of the simulation study:
-
-a) Simulate differentially methylated clusters of CpGs:
-    - `SimulateData()` in script file `R/2_simulatedata.R`
+a) Simulate differentially methylated clusters of CpGs. 
+  
+File: 
+  - `SimulateData()` in script file `R/2_simulatedata.R`
+  
+Main Input: `betaVals_mat`, `startEndCpG_df` file that indicates clusters of CpGs, treatment effects to be added to the clusters 
+  
+Main OUtput: simulated beta value matrix, where treatment effects were added to 500 randomly selected clusters of CpGs
     
 b) Apply DMR finding methods to the simulated datasets:
+
+Files: 
     - `RunBumphunter()` in script file `R/3_RunBumphunter.R`
     - `RunDMRcate()` in script file `R/3_RunDMRcate.R`
     - `RunProbeLasso()` in script file `R/3_RunProbeLasso.R`
     - The `Comb-p` method was implemented in `Python`. The corresponding shell script is `exec/run_combp_working1.sh`
+    
+Main output: significant DMRs identified by each of the methods
+    
 c) Summarize results of DMR finding methods:
+
+Files: 
     - `ProcessBumphunterResults()` in script file `R/5_read_and_summarize_Bumphunter_results.R`
     - `ProcessDMRcateResults()` in script file `R/5_read_and_summarize_DMRcate_results.R`
     - `ProcessProbeLassoResults()` in script file `R/5_read_and_summarize_ProbeLasso_results.R`
     - `ProcessCombpResults()` in script file `R/5_standardize_and_summarize_Comb-p_results.R`
+
+Main output: 
+  - These functions compares the significant DMRs identified by each method, evaluates whether they overlap with the true positive clusters where treatment effects were added, and then computes summary statistics including TP, FP, TN, FN, power, precision, median number of CpGs in significant DMRs
+
+These functions were called by three wrapper functions 
+
+- `WriteBumphunterResults()` in script file `R/4_simulate_and_save_Bumphunter_results.R`
+- `WriteDMRcateResults()` in script file `R/4_simulate_and_save_DMRcate_results.R`
+- `WriteProbeLassoResults()` in script file `R/4_simulate_and_save_ProbeLasso_results.R`
 
 ### IV. Table of Results
 True Positives (TP), False Positives (FP), False Negatives (FN), Power, Precision, Area under Precision-Recall curve (AuPR), Matthews' correlation coefficient (MCC), F1 Scores (F1) and Elapsed Time (in seconds) for the different DMR detection tools based on simulation datasets:
