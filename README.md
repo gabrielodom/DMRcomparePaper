@@ -6,24 +6,19 @@ This project contains analysis scripts used in the manuscript "An Evaluation of 
 
 ### I. Download Public Methylation Dataset GSE41169
 
-File: `/inst/1_downloader2.5.R`
-
-Input: GEO accession number, criteria for selecting methylation datasets.
-
-Output: `betaVals_mat`, which is beta value matrix for selected methylation samples. This file has rows = cpg ids, columns = sample ids. An example file is at `/data/betaVals_mat.csv`.
+-   File: `/inst/1_downloader2.5.R`
+-   Input: GEO accession number, criteria for selecting methylation datasets.
+-   Output: `betaVals_mat`, which is beta value matrix for selected methylation samples. This file has rows = cpg ids, columns = sample ids. An example file is at `/data/betaVals_mat.csv`.
 
 ### II. Perform Adjacent Site Clustering to Obtain Clusters of Adjacent CpG Probes (A-clusters)
 
 The A-clustering algorithm described in Sofer et al. (2011) was used to identify clusters of adjacent CpGs.
 
-File: `/inst/1_Aclust_data_import.R`
-
-Input:
-
-1.  `betaVals_mat`: a beta value matrix of all CpGs on the array
-2.  `cpgLocation_df`: an annotation file that indicates locations of CpGs. This file has rows = cpg ids, columns = chromosome, location. An example file is at `/data/cpgLocation_df.csv`.
-
-Output: `startEndCPG_df`, which is beta value matrix for clusters of CpGs. This file has rows = cpg ids, columns = cluster number, chr, start of cluster, end of cluster, sample ids. An example file is at `/data/startEndCpG_df.csv`.
+-   File: `/inst/1_Aclust_data_import.R`
+-   Input:
+    1.  `betaVals_mat`: a beta value matrix of all CpGs on the array
+    2.  `cpgLocation_df`: an annotation file that indicates locations of CpGs. This file has rows = cpg ids, columns = chromosome, location. An example file is at `/data/cpgLocation_df.csv`.
+-   Output: `startEndCPG_df`, which is beta value matrix for clusters of CpGs. This file has rows = cpg ids, columns = cluster number, chr, start of cluster, end of cluster, sample ids. An example file is at `/data/startEndCpG_df.csv`.
 
 ### III. Simulation Study
 
