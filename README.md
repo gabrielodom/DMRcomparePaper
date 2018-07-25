@@ -18,39 +18,52 @@ The A-clustering algorithm described in Sofer et al. (2011) was used to identify
 
 File: `/inst/1_Aclust_data_import.R`
 
-Input: (1) `betaVals_mat`, which is beta value matrix of all cpgs on the array; (2) `cpgLocation_df`, which is annotation file that indicates locations of CpGs. This file has rows = cpg ids, columns = chromosome, location. An example file is at `/data/cpgLocation_df.csv`.
+Input:
 
-Output: startEndCPG\_df, which is beta value matrix for clusters of CpGs. This file has rows = cpg ids, columns = cluster number, chr, start of cluster, end of cluster, sample ids. An example file is at `/data/startEndCpG_df.csv`.
+1.  `betaVals_mat`: a beta value matrix of all CpGs on the array
+2.  `cpgLocation_df`: an annotation file that indicates locations of CpGs. This file has rows = cpg ids, columns = chromosome, location. An example file is at `/data/cpgLocation_df.csv`.
+
+Output: `startEndCPG_df`, which is beta value matrix for clusters of CpGs. This file has rows = cpg ids, columns = cluster number, chr, start of cluster, end of cluster, sample ids. An example file is at `/data/startEndCpG_df.csv`.
 
 ### III. Simulation Study
 
-There are three main steps in the simulation study. See `/docs/DMRcompare.pdf` for details of each function described below.
+There are three main steps in the simulation study. See `/docs/DMRcompare.pdf` for details of each function.
 
-**1. Simulate differentially methylated clusters of CpGs.**
+1.  Simulate differentially methylated clusters of CpGs.
 
-File: - `SimulateData()` in script file `R/2_simulatedata.R`
+File: `SimulateData()` in script file `R/2_simulatedata.R`
 
-Main Input: `betaVals_mat`, `startEndCpG_df` file that indicates clusters of CpGs, treatment effects to be added to the clusters
+Main Input: `betaVals_mat`, `startEndCpG_df` (file that indicates clusters of CpGs), treatment effects to be added to the clusters
 
-Main OUtput: simulated beta value matrix, where treatment effects were added to 500 randomly selected clusters of CpGs
+Main Output: simulated beta value matrix, where treatment effects were added to 500 randomly selected clusters of CpGs
 
-**2. Apply DMR finding methods to the simulated datasets**
+1.  Apply DMR finding methods to the simulated datasets:
 
-Files: - `RunBumphunter()` in script file `R/3_RunBumphunter.R` - `RunDMRcate()` in script file `R/3_RunDMRcate.R` - `RunProbeLasso()` in script file `R/3_RunProbeLasso.R` - The `Comb-p` method was implemented in `Python`. The corresponding shell script is `exec/run_combp_working1.sh`
+Files:
 
-Main output: significant DMRs identified by each of the methods\*\*
+-   `RunBumphunter()` in script file `R/3_RunBumphunter.R`
+-   `RunDMRcate()` in script file `R/3_RunDMRcate.R`
+-   `RunProbeLasso()` in script file `R/3_RunProbeLasso.R`
+-   The `Comb-p` method was implemented in `Python`. The corresponding shell script is `exec/run_combp_working1.sh`
 
-**3. Summarize results of DMR finding methods**
+Main output: significant DMRs identified by each of the methods.
 
-Files: - `ProcessBumphunterResults()` in script file `R/5_read_and_summarize_Bumphunter_results.R` - `ProcessDMRcateResults()` in script file `R/5_read_and_summarize_DMRcate_results.R` - `ProcessProbeLassoResults()` in script file `R/5_read_and_summarize_ProbeLasso_results.R` - `ProcessCombpResults()` in script file `R/5_standardize_and_summarize_Comb-p_results.R`
-
-Main output: - These functions compares the significant DMRs identified by each method, evaluates whether they overlap with the true positive clusters where treatment effects were added, and then computes summary statistics including TP, FP, TN, FN, power, precision, median number of CpGs in significant DMRs
-
-These functions were called by three wrapper functions
+These functions are called by three wrapper functions
 
 -   `WriteBumphunterResults()` in script file `R/4_simulate_and_save_Bumphunter_results.R`
 -   `WriteDMRcateResults()` in script file `R/4_simulate_and_save_DMRcate_results.R`
 -   `WriteProbeLassoResults()` in script file `R/4_simulate_and_save_ProbeLasso_results.R`
+
+1.  Summarize results of DMR finding methods:
+
+Files:
+
+-   `ProcessBumphunterResults()` in script file `R/5_read_and_summarize_Bumphunter_results.R`
+-   `ProcessDMRcateResults()` in script file `R/5_read_and_summarize_DMRcate_results.R`
+-   `ProcessProbeLassoResults()` in script file `R/5_read_and_summarize_ProbeLasso_results.R`
+-   `ProcessCombpResults()` in script file `R/5_standardize_and_summarize_Comb-p_results.R`
+
+Main output: These functions compare the significant DMRs identified by each method, evaluate whether they overlap with the true positive clusters where treatment effects were added, and then compute summary statistics including TP, FP, TN, FN, power, precision, median number of CpGs in significant DMRs
 
 ### IV. Table of Results
 
