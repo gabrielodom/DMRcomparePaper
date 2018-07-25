@@ -1,12 +1,16 @@
 #' CPG Locations
 #'
-#' @description Mapping table between Chromosome Labels, IDs, and info
+#' @description An annotation table that indicates locations of CpGs. This data
+#'    frame has CPG IDs as the rows with matching chromosome and location info
+#'    in the columns.
 #'
-#' @format A data frame containing 485512 CPG locations. The three columns are
-#'    \code{ILMNID} as a factor, the chromosome label as a character
-#'    (\code{chr}), and the \code{MAPINFO} as an integer.
-#'
-#' @keywords internal
+#' @format A data frame containing 485512 CPGs (rows) and three columns. The
+#'    columns are:
+#'    \itemize{
+#'      \item{\code{ILMNID} : }{the CPG ID, as a factor}
+#'      \item{\code{chr} : }{the chromosome label, as a character}
+#'      \item{\code{MAPINFO} : }{the chromosome location, as an integer}
+#'    }
 #'
 #' @source Compiled via the \code{1_Aclust_data_import.R} script in the
 #'    \code{old_scripts} sub-directory of the \code{inst} directory.

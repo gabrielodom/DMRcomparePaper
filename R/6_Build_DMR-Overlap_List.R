@@ -17,10 +17,14 @@
 #'    completed results files in the \code{bestResultsDir} directory.
 #' @param seed A seed value corresponding to one of the simulations with
 #'    completed results files in the \code{bestResultsDir} directory.
-#' @param CPGs_df A data frame matching chromosomes to CPG names and
-#'    locations. The default value is given in the \code{cpgLocation_df} data
-#'    set. This data set is only necessary if the results directory contains
-#'    Comb-p results with the specified \code{delta} and \code{seed} values.
+#' @param CPGs_df An annotation table that indicates locations of CpGs.
+#'    This data frame has CPG IDs as the rows with matching chromosome and
+#'    location info in the columns. Specifically, the columns are: \code{ILMNID}
+#'     - the CPG ID; \code{chr} - the chromosome label; and \code{MAPINFO} -
+#'    the chromosome location. An example is given in the \code{cpgLocation_df}
+#'    data set. This data set is only necessary if the results directory
+#'    contains Comb-p results with the specified \code{delta} and \code{seed}
+#'    values.
 #' @param min.cpgs The minimum number of CPGs before we consider a result
 #'    significant. Defaults to 5. This argument is only required if the results
 #'    directory contains Comb-p results with the specified \code{delta} and

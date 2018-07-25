@@ -3,10 +3,15 @@
 #' @description Given a randomly selected subset of clusters, add some constant
 #'    value to each beta value in one observation class
 #'
-#' @param beta_mat A matrix of beta values across genome on the array. This is
-#'    given in the \code{betaVals_mat} data set.
-#' @param AclustCPG_df A data frame of \code{Aclust} results. This is given in
-#'    the \code{startEndCPG_df} data set.
+#' @param beta_mat A beta value matrix for selected methylation samples from a
+#'    450k methylation array with CPG IDs as the row names and sample IDs as
+#'    the column names. An example is given in the \code{betaVals_mat} data set.
+#' @param AclustCPG_df A data frame of beta values and CpG information for
+#'    clusters of CpGs over a 450k methylation array. The rows correspond to the
+#'    CPGs. The columns have information on the cluster number, chromosome,
+#'    cluster start and end locations, and the beta values for each subject
+#'    grouped by some clinical indicator (e.g. case v. control). An example is
+#'    given in the \code{startEndCPG_df} data set.
 #' @param delta_num The treatment size: a non-negative real number to add to
 #'    the beta values within randomly-selected clusters for a single class of
 #'    subjects. This artifically creates differentially-methylated regions

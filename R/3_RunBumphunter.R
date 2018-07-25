@@ -11,8 +11,12 @@
 #'    matrix. Defaults to \code{factor(c(rep("Tumor", 7), rep("Normal", 7)))}
 #' @param chromos_char A character vector with the chromosomes of each location
 #' @param chromPosit_num A numeric vector representing the chromosomal position
-#' @param cpgLocation_df A data frame matching chromosomes to CPG names and
-#'    locations. This is given in the \code{cpgLocation_df} data set.
+#' @param cpgLocation_df An annotation table that indicates locations of CpGs.
+#'    This data frame has CPG IDs as the rows with matching chromosome and
+#'    location info in the columns. Specifically, the columns are: \code{ILMNID}
+#'     - the CPG ID; \code{chr} - the chromosome label; and \code{MAPINFO} -
+#'    the chromosome location. An example is given in the \code{cpgLocation_df}
+#'    data set.
 #' @param pickCutoffQ_num The quantile used for picking the cutoff using the
 #'    permutation distribution, passed to the \code{\link[bumphunter]{bumphunter}}
 #'    function.

@@ -5,12 +5,21 @@
 #'
 #' @param resultsDir The name of the directory where the Comb-p method results
 #'    are stored.
-#' @param beta_mat A matrix of beta values across genome on the array. This is
-#'    given in the \code{betaVals_mat} data set.
-#' @param AclustCPG_df A data frame of \code{Aclust} results. This is given in
-#'    the \code{startEndCPG_df} data set.
-#' @param cpgLocation_df A data frame matching chromosomes to CPG names and
-#'    locations. This is given in the \code{cpgLocation_df} data set.
+#' @param beta_mat A beta value matrix for selected methylation samples from a
+#'    450k methylation array with CPG IDs as the row names and sample IDs as
+#'    the column names. An example is given in the \code{betaVals_mat} data set.
+#' @param AclustCPG_df A data frame of beta values and CpG information for
+#'    clusters of CpGs over a 450k methylation array. The rows correspond to the
+#'    CPGs. The columns have information on the cluster number, chromosome,
+#'    cluster start and end locations, and the beta values for each subject
+#'    grouped by some clinical indicator (e.g. case v. control). An example is
+#'    given in the \code{startEndCPG_df} data set.
+#' @param cpgLocation_df An annotation table that indicates locations of CpGs.
+#'    This data frame has CPG IDs as the rows with matching chromosome and
+#'    location info in the columns. Specifically, the columns are: \code{ILMNID}
+#'     - the CPG ID; \code{chr} - the chromosome label; and \code{MAPINFO} -
+#'    the chromosome location. An example is given in the \code{cpgLocation_df}
+#'    data set.
 #' @param dmr.sig.threshold Significance level to select regions (with
 #'    \code{dmr.pval} less than the specified value) passed to the internal
 #'    \code{\link{MergeDMRsWithCPGs}} function.

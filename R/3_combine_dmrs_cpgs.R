@@ -6,9 +6,11 @@
 #'    \code{dmr.chr} (e.g. \code{chr1}), and \code{dmr.pval}. This data frame
 #'    will be returned by the \code{extractRanges()} function from the
 #'    \code{DMRcate} package.
-#' @param CPGs_df A data frame matching chromosomes to CPG names and locations.
-#'    This data frame contains the variables \code{ILMNID}, \code{MAPINFO}, and
-#'    \code{chr} (e.g. \code{chr1}) and is given in the \code{cpgLocation_df}
+#' @param CPGs_df An annotation table that indicates locations of CpGs.
+#'    This data frame has CPG IDs as the rows with matching chromosome and
+#'    location info in the columns. Specifically, the columns are: \code{ILMNID}
+#'     - the CPG ID; \code{chr} - the chromosome label; and \code{MAPINFO} -
+#'    the chromosome location. An example is given in the \code{cpgLocation_df}
 #'    data set.
 #' @param alpha Significance level to select regions (with \code{dmr.pval} less
 #'    than the specified value). Defaults to 0.05.

@@ -5,6 +5,9 @@
 #'    each method in a shared figure.
 #'
 #' @param prCurves_ls A list of PR-curve objects
+#' @param plotTitle The title of the plot.The default value of \code{"default"}
+#'    will make the plot title "Venn Diagram for mu = DELTA, rep = INDEX OF
+#'    SEED".
 #' @param new Should the PR curves from this list form their own graph
 #'    (\code{TRUE}) or be added onto a previous PR-curve figure (\code{FALSE}).
 #'    Defaults to \code{TRUE}.
@@ -32,6 +35,7 @@
 #'    PlotPRCurve(prCurves_0.4_100_ls)
 #' }
 PlotPRCurve <- function(prCurves_ls,
+                        plotTitle = "default",
                         new = TRUE,
                         lineWidth = 1,
                         colours = NULL){
@@ -57,12 +61,18 @@ PlotPRCurve <- function(prCurves_ls,
   # Foundation Plot
   if(new){
 
+    if(plotTitle == "default"){
+      plotTitle <- paste0(
+        "Precision-recall curve: mu = ", delta, ", rep = ", repl
+      )
+    }
+
     # Main
     plot(
       prCurves_ls[[1]],
       color = colours[1],
       auc.main = FALSE, legend = TRUE,
-      main = paste0("Precision-recall curve: mu = ", delta, ", rep = ", repl),
+      main = plotTitle,
       cex.main = 1, lwd = lineWidth
     )
 

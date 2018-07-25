@@ -16,15 +16,23 @@
 #'    completed results files in the \code{bestResultsDir} directory.
 #' @param seed A seed value corresponding to one of the simulations with
 #'    completed results files in the \code{bestResultsDir} directory.
-#' @param beta_mat A matrix of beta values across genome on the array. The
-#'    default value is given in the \code{betaVals_mat} data set.
-#' @param AclustCPG_df A data frame of \code{Aclust} results. The default value
-#'    is given in the \code{startEndCPG_df} data set.
-#' @param CPGs_df A data frame matching chromosomes to CPG names and
-#'    locations. The default value is given in the \code{cpgLocation_df} data
-#'    set, passed to the \code{\link{StandardizeOutput}} function. This data
-#'    set is only necessary if the results directory contains Comb-p results
-#'    with the specified \code{delta} and \code{seed} values.
+#' @param beta_mat A beta value matrix for selected methylation samples from a
+#'    450k methylation array with CPG IDs as the row names and sample IDs as
+#'    the column names. An example is given in the \code{betaVals_mat} data set.
+#' @param AclustCPG_df A data frame of beta values and CpG information for
+#'    clusters of CpGs over a 450k methylation array. The rows correspond to the
+#'    CPGs. The columns have information on the cluster number, chromosome,
+#'    cluster start and end locations, and the beta values for each subject
+#'    grouped by some clinical indicator (e.g. case v. control). An example is
+#'    given in the \code{startEndCPG_df} data set.
+#' @param CPGs_df An annotation table that indicates locations of CpGs.
+#'    This data frame has CPG IDs as the rows with matching chromosome and
+#'    location info in the columns. Specifically, the columns are: \code{ILMNID}
+#'     - the CPG ID; \code{chr} - the chromosome label; and \code{MAPINFO} -
+#'    the chromosome location. An example is given in the \code{cpgLocation_df}
+#'    data set. This data set is only necessary if the results directory
+#'    contains Comb-p results with the specified \code{delta} and \code{seed}
+#'    values.
 #' @param min.cpgs The minimum number of CPGs necessary to consider a result
 #'    significant. Defaults to 5. This argument is only required if the results
 #'    directory contains Comb-p results with the specified \code{delta} and

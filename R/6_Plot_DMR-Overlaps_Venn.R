@@ -13,8 +13,15 @@
 #'    have included (\code{delta = c(0.025, 0.05, 0.1, 0.15, 0.2, 0.3, 0.4)} and
 #'    \code{seed = c(100, 210, 330, 450, 680)}), this directory should contain
 #'    35 \code{.RDS} files per method.
-#' @param figsDir In which directory should the figures be saved?
 #' @param figFileName The name of the figure
+#' @param device Which graphics device should be used to save the figures?
+#'    Defaults to \code{\link[grDevices]{pdf}}. Note that if you use a device
+#'    other than PDF (\code{\link[grDevices]{jpeg}} for instance), you can only
+#'    plot one \code{delta_num} and \code{seed_int} combination per file.
+#' @param plotTitle The title of the plot. This argument is passed to the
+#'    \code{\link[ChIPpeakAnno]{makeVennDiagram}} function. The default value of
+#'    \code{"default"} will make the plot title "Venn Diagram for mu = DELTA,
+#'    rep = INDEX OF SEED".
 #' @param delta_num A vector of treatment sizes with values corresponding to one
 #'    of the simulations with completed results files in the
 #'    \code{bestResultsDir} directory.
@@ -26,16 +33,20 @@
 #'    value specifying the total number of tests performed to obtain the list
 #'    of peaks. It should be much larger than the number of peaks in the largest
 #'    peak set.
-#' @param CPGs_df A data frame matching chromosomes to CPG names and
-#'    locations. The default value is given in the \code{cpgLocation_df} data
-#'    set. This data set is only necessary if the results directory contains
-#'    Comb-p results with the specified \code{delta} and \code{seed} values.
-#'    This is passed to the \code{\link{BuildOverlaps}} function.
+#' @param CPGs_df An annotation table that indicates locations of CpGs.
+#'    This data frame has CPG IDs as the rows with matching chromosome and
+#'    location info in the columns. Specifically, the columns are: \code{ILMNID}
+#'     - the CPG ID; \code{chr} - the chromosome label; and \code{MAPINFO} -
+#'    the chromosome location. An example is given in the \code{cpgLocation_df}
+#'    data set. This data set is only necessary if the results directory
+#'    contains Comb-p results with the specified \code{delta} and \code{seed}
+#'    values. This is passed to the \code{\link{BuildOverlaps}} function.
 #' @param min.cpgs The minimum number of CPGs before we consider a result
 #'    significant. Defaults to 5. This argument is only required if the results
 #'    directory contains Comb-p results with the specified \code{delta} and
 #'    \code{seed} values. This is passed to the \code{\link{BuildOverlaps}}
 #'    function.
+#' @param ... Dots for additional arguments to be passed to the graphics device
 #'
 #' @return Nothing. A PDF file of plots is created as a side effect.
 #'
@@ -49,18 +60,19 @@
 #' \dontrun{
 #'   PlotOverlaps(
 #'     bestResultsDir = "best_cases_results/",
-#'     figsDir = "best_cases_results/resultsFigures/",
-#'     figFileName = "testVenn_allDesigns2"
+#'     figFileName = "best_cases_results/resultsFigures/testVenn_allDesigns2"
 #'   )
 #' }
 PlotOverlaps <- function(bestResultsDir,
-                         figsDir,
                          figFileName,
+                         device = pdf,
+                         plotTitle = "default",
                          delta_num = c(0.025, 0.05, 0.1, 0.15, 0.2, 0.3, 0.4),
                          seeds_int = c(100, 210, 330, 450, 680),
                          totalTest_int = 3063,
                          CPGs_df = cpgLocation_df,
-                         min.cpgs = 5){
+                         min.cpgs = 5,
+                         ...){
 
   # Group by seeds
   design_mat <- expand.grid(seeds_int, delta_num)
@@ -93,16 +105,22 @@ PlotOverlaps <- function(bestResultsDir,
 
   }
 
-  pdf(file = paste0(figsDir, figFileName, ".pdf"))
+  device(file = figFileName, ...)
   lapply(overlapsByMethods_ls, function(x){
 
     delta_num <- attr(x, "delta")
     repl_int  <- attr(x, "repl")
 
+    if(plotTitle == "default"){
+      plotTitle <- paste0(
+        "Venn Diagram for mu = ", delta_num, ", rep = ", repl_int
+      )
+    }
+
     makeVennDiagram(
       x, NameOfPeaks = names(x), totalTest = totalTest_int,
       by = "region", fill = CreateHue(length(x)),
-      main = paste0("Venn Diagram for mu = ", delta_num, ", rep = ", repl_int)
+      main = plotTitle
     )
 
   })

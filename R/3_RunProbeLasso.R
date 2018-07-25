@@ -10,8 +10,12 @@
 #' @param labels_fct A factor vector of subject class labels. These should
 #'    match the observations contained in the columns of the \code{betaVals_mat}
 #'    matrix. Defaults to \code{factor(c(rep("Tumor", 7), rep("Normal", 7)))}
-#' @param cpgLocation_df A data frame matching chromosomes to CPG names and
-#'    locations. This is given in the \code{cpgLocation_df} data set.
+#' @param cpgLocation_df An annotation table that indicates locations of CpGs.
+#'    This data frame has CPG IDs as the rows with matching chromosome and
+#'    location info in the columns. Specifically, the columns are: \code{ILMNID}
+#'     - the CPG ID; \code{chr} - the chromosome label; and \code{MAPINFO} -
+#'    the chromosome location. An example is given in the \code{cpgLocation_df}
+#'    data set.
 #' @param adjPvalProbe_num The minimum threshold of significance for probes to
 #'    be includede in DMRs, passed to the \code{\link[ChAMP]{champ.DMR}}
 #'    function.
