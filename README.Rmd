@@ -15,7 +15,7 @@ knitr::opts_chunk$set(
 ```
 
 # DMRcompare
-This project contains analysis scripts used in the manuscript "An Evaluation of Supervised Methods for Identifying Differentially Methylated Regions in Illumina Methylation Arrays" by Mallik et al. The reference files for all functions  in this project is in `/docs/DMRcompare.pdf`. 
+This project contains analysis scripts used in the manuscript "An Evaluation of Supervised Methods for Identifying Differentially Methylated Regions in Illumina Methylation Arrays" by Mallik et al (2018). The reference files for all functions  in this project is in `/docs/DMRcompare.pdf`. 
 
 ### I. Download Public Methylation Dataset GSE41169
 
@@ -26,7 +26,7 @@ This project contains analysis scripts used in the manuscript "An Evaluation of 
 
 ### II. Perform Adjacent Site Clustering to Obtain Clusters of Adjacent CpG Probes (A-clusters)
 
-The A-clustering algorithm described in Sofer et al. (2011) was used to identify clusters of adjacent CpGs. 
+The A-clustering algorithm described in Sofer et al. (2011) (PMID: 23990415) was used to identify clusters of adjacent CpGs. 
 
 - File: `/inst/1_Aclust_data_import.R`
 - Input:
@@ -41,8 +41,8 @@ There are three main steps in the simulation study. See `/docs/DMRcompare.pdf` f
 
 a) Simulate differentially methylated clusters of CpGs. 
     - File: `SimulateData()` in script file `R/2_simulatedata.R`
-    - Main Input: `betaVals_mat`, `startEndCpG_df` (file that indicates clusters of CpGs), treatment effects to be added to the clusters 
-    - Main Output: simulated beta value matrix, where treatment effects were added to 500 randomly selected clusters of CpGs
+    - Main Input: `betaVals_mat`(beta values for all probes on the array), `startEndCpG_df` (file that indicates clusters of CpGs), treatment effects to be added to the clusters (e.g. delta = c(0.025, 0.05, 0.1, 0.15, 0.2, 0.3, 0.4) in our study)
+    - Main Output: simulated beta value matrix for all probes on the array, where treatment effects were added to 500 randomly selected clusters of CpGs. 
 b) Apply DMR finding methods to the simulated datasets:
     - Files:
         - `RunBumphunter()` in script file `R/3_RunBumphunter.R`
