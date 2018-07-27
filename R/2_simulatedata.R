@@ -1,9 +1,10 @@
 #' Simulate Differences in Methylation Data
 #'
-#' @description Given a randomly selected subset of clusters, add some constant
-#'    value to each beta value in one observation class
+#' @description This function generates a methylation dataset where treatment effects (some constant values) are added 
+#' to to beta values in one observation class for some randomly selected co-methylated clusters 
+#'    
 #'
-#' @param beta_mat A beta value matrix for selected methylation samples from a
+#' @param beta_mat A beta value matrix for methylation samples from a
 #'    450k methylation array with CPG IDs as the row names and sample IDs as
 #'    the column names. An example is given in the \code{betaVals_mat} data set.
 #' @param AclustCPG_df A data frame of beta values and CpG information for
