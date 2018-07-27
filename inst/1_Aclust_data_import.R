@@ -2,12 +2,17 @@
 ########### Summary ------------------------------------------------------------------------------------------------
 #
 # Purpose: This file was used to obtain co-methylated clusters of CpGs using the Adjacent Site Clustering algorithm
+#          in Sofer et al. (2011) (PMID:23990415)
 # 
-# Input: 
+# Input: (1) betaVals_mat: a beta value matrix of all CpGs on the array
+#        (2) cpgLocation_df: an annotation file that indicates locations of CpGs. 
+#            This file has rows = cpg ids, columns = chromosome, location. An example file is at /data/cpgLocation_df.csv.
 #
-# Output: 
+# Output: startEndCPG_df, which is beta value matrix for clusters of CpGs. 
+#         This file has rows = cpg ids, columns = cluster number, chr, start of cluster, end of cluster, sample ids. 
+#         An example file is at /data/startEndCpG_df.csv.
 #
-########## -----------------------------------------------------------------------------------------------------------
+############# ---------------------------------------------------------------------------------------------------------
 
 
 ######  Library  ##############################################################
