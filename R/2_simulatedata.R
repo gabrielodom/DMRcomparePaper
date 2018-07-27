@@ -1,38 +1,41 @@
 #' Simulate Differences in Methylation Data
 #'
-#' @description This function generates a methylation dataset where treatment effects (some constant values) are added 
-#' to to beta values in one observation class for some randomly selected co-methylated clusters 
+#' @description This function generates a methylation dataset where treatment effects are added 
+#' to beta values in one group of samples for some randomly selected co-methylated clusters. 
 #'    
-#'
 #' @param beta_mat A beta value matrix for methylation samples from a
 #'    450k methylation array with CPG IDs as the row names and sample IDs as
-#'    the column names. An example is given in the \code{betaVals_mat} data set.
+#'    the column names. An example is given in the \code{/data/betaVals_mat} data set.
+#'    
 #' @param AclustCPG_df A data frame of beta values and CpG information for
 #'    clusters of CpGs over a 450k methylation array. The rows correspond to the
 #'    CPGs. The columns have information on the cluster number, chromosome,
-#'    cluster start and end locations, and the beta values for each subject
-#'    grouped by some clinical indicator (e.g. case v. control). An example is
-#'    given in the \code{startEndCPG_df} data set.
+#'    cluster start and end locations, and the samples grouped by some clinical indicator 
+#'    (e.g. case v. control). An example is given in the \code{/data/startEndCPG_df} data set.
+#'    
 #' @param delta_num The treatment size: a non-negative real number to add to
-#'    the beta values within randomly-selected clusters for a single class of
-#'    subjects. This artifically creates differentially-methylated regions
+#'    the beta values within randomly-selected clusters for the first  \code{numEx_int} samples. 
+#'    This artifically creates differentially-methylated regions
 #'    (DMRs).
+#'    
 #' @param seed_int The seed value passed to the \code{\link[base]{Random}}
 #'    function to enable reproducible results
+#'    
 #' @param betaCols_idx The column numbers of the \code{AclustCPG_df} data frame
-#'    in which beta values for each subject are stored. This function assumes
-#'    that the subject columns are grouped by their class.
-#' @param numEx_int The number of samples in the first group. Once again, this
-#'    function assumes that these samples are contiguous columns of the
+#'    in which beta values for each subject are stored. 
+#'    
+#' @param numEx_int The number of samples in the first group. This
+#'    function assumes that samples in one group are contiguous columns of the
 #'    \code{AclustCPG_df} data frame.
-#' @param numClusters_int The total number of clusters to randomly select to
+#'    
+#' @param numClusters_int The total number of clusters that are randomly selected to
 #'    be inflated by the treatment amount, \code{delta_num}
 #'
 #' @return A list with two elements:
 #'    \itemize{
 #'      \item{\code{simBetaVals_df}}{A data frame of beta values after
 #'        treatment effects were added, used for input for different DMR-finding
-#'        methods. Note this is whole-genome data.}
+#'        methods. Note this dataset has all the probes on the array.}
 #'      \item{\code{simAclusters_df}}{A data frame of the methylation values
 #'        only for \code{Aclust} and annotation for whether treatment effects
 #'        were added. Note this has only CPGs mapped to all the clusters found
