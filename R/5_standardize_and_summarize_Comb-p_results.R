@@ -5,32 +5,39 @@
 #'
 #' @param resultsDir The name of the directory where the Comb-p method results
 #'    are stored.
-#' @param beta_mat A beta value matrix for selected methylation samples from a
-#'    450k methylation array with CPG IDs as the row names and sample IDs as
+#'    
+#' @param beta_mat A beta value matrix for methylation samples from a
+#'    450k methylation array with CpG IDs as the row names and sample IDs as
 #'    the column names. An example is given in the \code{betaVals_mat} data set.
+#' 
 #' @param AclustCPG_df A data frame of beta values and CpG information for
 #'    clusters of CpGs over a 450k methylation array. The rows correspond to the
 #'    CPGs. The columns have information on the cluster number, chromosome,
 #'    cluster start and end locations, and the beta values for each subject
 #'    grouped by some clinical indicator (e.g. case v. control). An example is
-#'    given in the \code{startEndCPG_df} data set.
+#'    given in the \code{startEndCPG_df} data set. 
+#'    This file also has information on true status of the clusters, via variable \code{status}, 
+#'    with values "positive" or "negative", indicating whether treatment effect was added to the cluster.
+#' 
 #' @param cpgLocation_df An annotation table that indicates locations of CpGs.
-#'    This data frame has CPG IDs as the rows with matching chromosome and
+#'    This data frame has CpG IDs as the rows with matching chromosome and
 #'    location info in the columns. Specifically, the columns are: \code{ILMNID}
 #'     - the CPG ID; \code{chr} - the chromosome label; and \code{MAPINFO} -
 #'    the chromosome location. An example is given in the \code{cpgLocation_df}
 #'    data set.
-#' @param dmr.sig.threshold Significance level to select regions (with
-#'    \code{dmr.pval} less than the specified value) passed to the internal
-#'    \code{\link{MergeDMRsWithCPGs}} function.
-#' @param min.cpgs The minimum number of CPGs necessary to consider a result
-#'    significant. Defaults to 5.
+#'    
+#' @param dmr.sig.threshold Regions with DMR p-value less than \code{dmr.sig.threshold}
+#'  are selected for the output. 
+#' 
+#' @param min.cpgs Minimum number of CpGs. Regions with at least \code{min.cpgs} are selected for the output.
+#'     Defaults to 5.
+#'    
 #' @param verbose Should the function print progress messages? Defaults to
 #'    \code{TRUE}.
 #'
-#' @return A data frame of model fit statistics for the Comb-p method under
-#'    each of the given parameter combinations to the data generated for each
-#'    design configuration
+#' @return A data frame of model performance measures for the Comb-p method under
+#'    each of the given parameter combinations applied to the data generated with different treatment effects 
+#'    
 #'
 #' @export
 #'
