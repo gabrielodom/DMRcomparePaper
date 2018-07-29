@@ -23,7 +23,7 @@ cluster start and end locations, and the beta values for each subject
 grouped by some clinical indicator (e.g. case v. control). An example is
 given in the \code{startEndCPG_df} data set. 
 This file also has information on true status of the clusters, via variable \code{status}, 
-with values "positive" or "negative", , indicating whether treatment effect was added to the cluster.}
+with values "positive" or "negative", indicating whether treatment effect was added to the cluster.}
 
 \item{verbose}{Should the function print progress messages? Defaults to
 \code{TRUE}.}
