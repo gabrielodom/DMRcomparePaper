@@ -4,40 +4,49 @@
 #'    \code{DMRcate} package, called internally by the
 #'    \code{\link{WriteDMRcateResults}} function.
 #'
-#' @param betaVals_mat A matrix of beta values returned in the second entry of
-#'    the output from the \code{SimulateData} function.
+#' @param betaVals_mat A matrix of beta values returned in the first entry of
+#'    the output from the \code{SimulateData} function, ordered by the CpGs. 
+#'    Note this dataset inlcudes all CpGs on the array.
+#'    
 #' @param labels_fct A factor vector of subject class labels. These should
 #'    match the observations contained in the columns of the \code{betaVals_mat}
 #'    matrix. Defaults to \code{factor(c(rep("Tumor", 7), rep("Normal", 7)))}
+#'    
 #' @param cpgLocation_df An annotation table that indicates locations of CpGs.
-#'    This data frame has CPG IDs as the rows with matching chromosome and
+#'    This data frame has CpG IDs as the rows with matching chromosome and
 #'    location info in the columns. Specifically, the columns are: \code{ILMNID}
-#'     - the CPG ID; \code{chr} - the chromosome label; and \code{MAPINFO} -
+#'     - the CpG ID; \code{chr} - the chromosome label; and \code{MAPINFO} -
 #'    the chromosome location. An example is given in the \code{cpgLocation_df}
 #'    data set.
+#'    
 #' @param lambda_int Gaussian kernel bandwidth for smoothed-function estimation
 #'    in the called \code{\link[DMRcate]{dmrcate}} function.
+#'    
 #' @param C_int Scaling factor for bandwidth in the internal call to the
 #'    \code{\link[DMRcate]{dmrcate}} function
+#'    
 #' @param nCores How many cores should be used to perform calculations? Defaults
 #'    to 1. Note that this function should be called from within the
 #'    \code{\link{WriteDMRcateResults}} function, which is already written in
 #'    parallel. Further note that the \code{DMRcate} package (as of version
 #'    1.16.0), does not support parallelization in Windows environments.
+#'    
 #' @param dmr.sig.threshold Significance level to select regions (with
 #'    \code{dmr.pval} less than the specified value) passed to the internal
 #'    \code{\link{StandardizeOutput}} function.
-#' @param min.cpgs The minimum number of CPGs necessary to consider a result
+#'    
+#' @param min.cpgs The minimum number of CpGs to consider a DMR
 #'    significant, passed to the internal \code{\link{StandardizeOutput}}
 #'    function. Defaults to 5.
-#' @param genome Reference genome for annotating DMRs with promoter overlaps,
-#'    passed to the \code{\link[DMRcate]{extractRanges}} function. Can be one
+#'    
+#' @param genome Reference genome for annotating DMRs,
+#'    passed to the \code{\link[DMRcate]{extractRanges}} function in DMRcate. Can be one
 #'    of \code{"hg19"}, \code{"hg38"}, or \code{"mm10"}. Defaults to
 #'    \code{"hg19"}.
 #'
 #'
 #' @return A list of two elements: a data frame of \code{dmrcate} results
-#'    that have been standardized by the \code{\link{StandardizeOutput}}
+#'    to be standardized by the \code{\link{StandardizeOutput}}
 #'    function and the computing time for the DMRcate method.
 #'
 #' @import DMRcatedata

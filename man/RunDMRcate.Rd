@@ -9,18 +9,19 @@ RunDMRcate(betaVals_mat, labels_fct = factor(c(rep("Tumor", 7), rep("Normal",
   dmr.sig.threshold = 0.05, min.cpgs = 5, genome = "hg19")
 }
 \arguments{
-\item{betaVals_mat}{A matrix of beta values returned in the second entry of
-the output from the \code{SimulateData} function.}
+\item{betaVals_mat}{A matrix of beta values returned in the first entry of
+the output from the \code{SimulateData} function, ordered by the CpGs. 
+Note this dataset inlcudes all CpGs on the array.}
 
 \item{labels_fct}{A factor vector of subject class labels. These should
 match the observations contained in the columns of the \code{betaVals_mat}
 matrix. Defaults to \code{factor(c(rep("Tumor", 7), rep("Normal", 7)))}}
 
 \item{cpgLocation_df}{An annotation table that indicates locations of CpGs.
-This data frame has CPG IDs as the rows with matching chromosome and
+This data frame has CpG IDs as the rows with matching chromosome and
 location info in the columns. Specifically, the columns are: \code{ILMNID}
- - the CPG ID; \code{chr} - the chromosome label; and \code{MAPINFO} -
-the chromosome location. An example is given in the \code{cpgLocation_df}
+ - the CpG ID; \code{chr} - the chromosome label; and \code{MAPINFO} -
+the chromosome location. An example is given in the \code{\data\cpgLocation_df}
 data set.}
 
 \item{lambda_int}{Gaussian kernel bandwidth for smoothed-function estimation
@@ -39,11 +40,11 @@ parallel. Further note that the \code{DMRcate} package (as of version
 \code{dmr.pval} less than the specified value) passed to the internal
 \code{\link{StandardizeOutput}} function.}
 
-\item{min.cpgs}{The minimum number of CPGs necessary to consider a result
+\item{min.cpgs}{The minimum number of CpGs to consider a DMR
 significant, passed to the internal \code{\link{StandardizeOutput}}
 function. Defaults to 5.}
 
-\item{genome}{Reference genome for annotating DMRs with promoter overlaps,
+\item{genome}{Reference genome for annotating DMRs,
 passed to the \code{\link[DMRcate]{extractRanges}} function. Can be one
 of \code{"hg19"}, \code{"hg38"}, or \code{"mm10"}. Defaults to
 \code{"hg19"}.}
