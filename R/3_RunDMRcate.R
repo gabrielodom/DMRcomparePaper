@@ -31,13 +31,11 @@
 #'    parallel. Further note that the \code{DMRcate} package (as of version
 #'    1.16.0), does not support parallelization in Windows environments.
 #'    
-#' @param dmr.sig.threshold Significance level to select regions (with
-#'    \code{dmr.pval} less than the specified value) passed to the internal
-#'    \code{\link{StandardizeOutput}} function.
+#' @param dmr.sig.threshold Regions with DMR p-value less than \code{dmr.sig.threshold}
+#'  are selected for the output 
 #'    
-#' @param min.cpgs The minimum number of CpGs to consider a DMR
-#'    significant, passed to the internal \code{\link{StandardizeOutput}}
-#'    function. Defaults to 5.
+#' @param min.cpgs Minimum number of CpGs. Regions with at least \code{min.cpgs} are selected for the output.
+#'     Defaults to 5.
 #'    
 #' @param genome Reference genome for annotating DMRs,
 #'    passed to the \code{\link[DMRcate]{extractRanges}} function in DMRcate. Can be one
@@ -46,8 +44,7 @@
 #'
 #'
 #' @return A list of two elements: a data frame of \code{dmrcate} results
-#'    to be standardized by the \code{\link{StandardizeOutput}}
-#'    function and the computing time for the DMRcate method.
+#'    and the computing time for the DMRcate method.
 #'
 #' @import DMRcatedata
 #'

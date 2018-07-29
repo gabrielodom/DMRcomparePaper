@@ -37,17 +37,14 @@
 #'    one less than the number of cores available on your machine, as detected
 #'    via the \code{\link[parallel]{detectCores}} function.
 #'    
-#' @param dmr.sig.threshold Significance level to select regions (with
-#'    \code{dmr.pval} less than the specified value) passed to the internal
-#'    \code{\link{StandardizeOutput}} function.
+#' @param dmr.sig.threshold Regions with DMR p-value less than \code{dmr.sig.threshold}
+#'  are selected for the output. 
 #'    
-#' @param min.cpgs The minimum number of CpGs before we consider a DMR
-#'    significant, passed to the internal \code{\link{StandardizeOutput}}
-#'    function. Defaults to 5.
+#' @param min.cpgs Minimum number of CpGs. Regions with at least \code{min.cpgs} are selected for the output.
+#'     Defaults to 5.
 #'
 #' @return A list of two elements: a data frame of \code{bumphunter} results
-#'    to be standardized by the \code{\link{StandardizeOutput}}
-#'    function and the computing time for the bumphunter method.
+#'    and the computing time for the bumphunter method.
 #'
 #' @importFrom parallel detectCores
 #' @importFrom doParallel registerDoParallel

@@ -5,39 +5,45 @@
 #'    the \code{\link[ChAMP]{champ.DMR}} function to perform the ProbeLasso
 #'    method calculations.
 #'
-#' @param betaVals_mat A matrix of beta values returned in the second entry of
-#'    the output from the \code{SimulateData} function
+#' @param betaVals_mat A matrix of beta values returned in the first entry of
+#'    the output from the \code{SimulateData} function, ordered by the CpGs. 
+#'    Note this dataset inlcudes all CpGs on the array.
+#'    
 #' @param labels_fct A factor vector of subject class labels. These should
 #'    match the observations contained in the columns of the \code{betaVals_mat}
 #'    matrix. Defaults to \code{factor(c(rep("Tumor", 7), rep("Normal", 7)))}
+#'    
 #' @param cpgLocation_df An annotation table that indicates locations of CpGs.
 #'    This data frame has CPG IDs as the rows with matching chromosome and
 #'    location info in the columns. Specifically, the columns are: \code{ILMNID}
-#'     - the CPG ID; \code{chr} - the chromosome label; and \code{MAPINFO} -
+#'     - the CpG ID; \code{chr} - the chromosome label; and \code{MAPINFO} -
 #'    the chromosome location. An example is given in the \code{cpgLocation_df}
 #'    data set.
+#'    
 #' @param adjPvalProbe_num The minimum threshold of significance for probes to
 #'    be includede in DMRs, passed to the \code{\link[ChAMP]{champ.DMR}}
 #'    function.
+#'    
 #' @param meanLassoRadius_int Radius around each DMP to detect DMR, passed to
 #'    the \code{\link[ChAMP]{champ.DMR}} function.
+#'    
 #' @param minDmrSep_int The minimum seperation (bp) between neighbouring DMRs,
 #'    passed to the \code{\link[ChAMP]{champ.DMR}} function.
+#'    
 #' @param nCores How many cores should be used to perform calculations? Defaults
 #'    to 1. Note that this function should be called from within the
 #'    \code{\link{WriteProbeLassoResults}} function, which is already written
 #'    in parallel. If this function is executed directly (not from within this
 #'    function), then this argument is passed to the \code{cores} argument of
 #'    the \code{\link[ChAMP]{champ.DMR}} function.
-#' @param dmr.sig.threshold Significance level to select regions (with
-#'    \code{dmr.pval} less than the specified value) passed to the internal
-#'    \code{\link{StandardizeOutput}} function
-#' @param min.cpgs The minimum number of CPGs necessary to consider a result
-#'    significant, passed to the internal \code{\link{StandardizeOutput}}
-#'    function. Defaults to 5.
+#'    
+#' @param dmr.sig.threshold Regions with DMR p-value less than \code{dmr.sig.threshold}
+#'  are selected for the output 
+#'    
+#' @param min.cpgs Minimum number of CpGs. Regions with at least \code{min.cpgs} are selected for the output.
+#'     Defaults to 5.
 #'
-#' @return A list of two elements: a data frame of \code{champ.DMR} results that
-#'    have been standardized by the \code{\link{StandardizeOutput}} function and
+#' @return A list of two elements: a data frame of \code{champ.DMR} results and
 #'    the computing time for the ProbeLasso method.
 #'
 #' @import ChAMPdata

@@ -21,7 +21,7 @@ matrix. Defaults to \code{factor(c(rep("Tumor", 7), rep("Normal", 7)))}}
 This data frame has CpG IDs as the rows with matching chromosome and
 location info in the columns. Specifically, the columns are: \code{ILMNID}
  - the CpG ID; \code{chr} - the chromosome label; and \code{MAPINFO} -
-the chromosome location. An example is given in the \code{\data\cpgLocation_df}
+the chromosome location. An example is given in the \code{cpgLocation_df}
 data set.}
 
 \item{lambda_int}{Gaussian kernel bandwidth for smoothed-function estimation
@@ -36,23 +36,20 @@ to 1. Note that this function should be called from within the
 parallel. Further note that the \code{DMRcate} package (as of version
 1.16.0), does not support parallelization in Windows environments.}
 
-\item{dmr.sig.threshold}{Significance level to select regions (with
-\code{dmr.pval} less than the specified value) passed to the internal
-\code{\link{StandardizeOutput}} function.}
+\item{dmr.sig.threshold}{Regions with DMR p-value less than \code{dmr.sig.threshold}
+are selected for the output}
 
-\item{min.cpgs}{The minimum number of CpGs to consider a DMR
-significant, passed to the internal \code{\link{StandardizeOutput}}
-function. Defaults to 5.}
+\item{min.cpgs}{Minimum number of CpGs. Regions with at least \code{min.cpgs} are selected for the output.
+Defaults to 5.}
 
 \item{genome}{Reference genome for annotating DMRs,
-passed to the \code{\link[DMRcate]{extractRanges}} function. Can be one
+passed to the \code{\link[DMRcate]{extractRanges}} function in DMRcate. Can be one
 of \code{"hg19"}, \code{"hg38"}, or \code{"mm10"}. Defaults to
 \code{"hg19"}.}
 }
 \value{
 A list of two elements: a data frame of \code{dmrcate} results
-   that have been standardized by the \code{\link{StandardizeOutput}}
-   function and the computing time for the DMRcate method.
+   and the computing time for the DMRcate method.
 }
 \description{
 A wrapper function for the DMRcate method from the
