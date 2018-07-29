@@ -10,22 +10,23 @@ RunBumphunter(betaVals_mat, labels_fct = factor(c(rep("Tumor", 7),
   dmr.sig.threshold = 0.05, min.cpgs = 5)
 }
 \arguments{
-\item{betaVals_mat}{A matrix of beta values returned in the second entry of
-the output from the \code{SimulateData} function, ordered by the CPGs.}
+\item{betaVals_mat}{A matrix of beta values returned in the first entry of
+the output from the \code{SimulateData} function, ordered by the CpGs. 
+Note this dataset inlcudes all CpGs on the array.}
 
 \item{labels_fct}{A factor vector of subject class labels. These should
 match the observations contained in the columns of the \code{betaVals_mat}
 matrix. Defaults to \code{factor(c(rep("Tumor", 7), rep("Normal", 7)))}}
 
-\item{chromos_char}{A character vector with the chromosomes of each location}
+\item{chromos_char}{A character vector for the chromosomes on which the CpGs are located}
 
-\item{chromPosit_num}{A numeric vector representing the chromosomal position}
+\item{chromPosit_num}{A numeric vector for the locations of the CpGs}
 
 \item{cpgLocation_df}{An annotation table that indicates locations of CpGs.
-This data frame has CPG IDs as the rows with matching chromosome and
+This data frame has CpG IDs as the rows with matching chromosome and
 location info in the columns. Specifically, the columns are: \code{ILMNID}
- - the CPG ID; \code{chr} - the chromosome label; and \code{MAPINFO} -
-the chromosome location. An example is given in the \code{cpgLocation_df}
+ - the CpG ID; \code{chr} - the chromosome label; and \code{MAPINFO} -
+the chromosome location. An example is given in the \code{\data\cpgLocation_df}
 data set.}
 
 \item{pickCutoffQ_num}{The quantile used for picking the cutoff using the
@@ -33,9 +34,7 @@ permutation distribution, passed to the \code{\link[bumphunter]{bumphunter}}
 function.}
 
 \item{maxGap_int}{The maximum location gap, passed to the
-\code{\link[bumphunter]{bumphunter}} function. This will be used to define
-the clusters of locations that are to be analyzed together via the
-\code{\link[bumphunter]{clusterMaker}} function.}
+\code{\link[bumphunter]{bumphunter}} function.}
 
 \item{B_int}{An integer denoting the number of resamples to use when
 computing null distributions, passed to the
@@ -50,13 +49,13 @@ via the \code{\link[parallel]{detectCores}} function.}
 \code{dmr.pval} less than the specified value) passed to the internal
 \code{\link{StandardizeOutput}} function.}
 
-\item{min.cpgs}{The minimum number of CPGs before we consider a result
+\item{min.cpgs}{The minimum number of CpGs before we consider a DMR
 significant, passed to the internal \code{\link{StandardizeOutput}}
 function. Defaults to 5.}
 }
 \value{
 A list of two elements: a data frame of \code{bumphunter} results
-   that have been standardized by the \code{\link{StandardizeOutput}}
+   to be standardized by the \code{\link{StandardizeOutput}}
    function and the computing time for the bumphunter method.
 }
 \description{
