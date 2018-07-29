@@ -20,7 +20,7 @@
 #'    This data frame has CpG IDs as the rows with matching chromosome and
 #'    location info in the columns. Specifically, the columns are: \code{ILMNID}
 #'     - the CpG ID; \code{chr} - the chromosome label; and \code{MAPINFO} -
-#'    the chromosome location. An example is given in the \code{\data\cpgLocation_df}
+#'    the chromosome location. An example is given in the \code{cpgLocation_df}
 #'    data set.
 #' @param pickCutoffQ_num The quantile used for picking the cutoff using the
 #'    permutation distribution, passed to the \code{\link[bumphunter]{bumphunter}}
