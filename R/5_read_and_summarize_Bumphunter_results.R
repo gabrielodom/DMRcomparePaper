@@ -20,13 +20,13 @@
 #'    grouped by some clinical indicator (e.g. case v. control). An example is
 #'    given in the \code{startEndCPG_df} data set. 
 #'    This file also has information on true status of the clusters, via variable \code{status}, 
-#'    with values "positive" or "negative". 
+#'    with values "positive" or "negative", , indicating whether treatment effect was added to the cluster. 
 #'    
 #' @param verbose Should the function print progress messages? Defaults to
 #'    \code{TRUE}.
 #'
 #' @return A data frame of model performance measures for the Bumphunter method under
-#'    each of the given parameter combinations to the data generated based on each treatment effect 
+#'    each of the given parameter combinations applied to the data generated with different treatment effects 
 #'    
 #'
 #' @export

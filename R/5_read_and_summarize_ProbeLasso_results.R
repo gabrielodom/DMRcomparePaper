@@ -8,22 +8,26 @@
 #'    results are stored. This should match the directory name supplied to the
 #'    \code{resultsDir} argument of the \code{\link{WriteProbeLassoResults}}
 #'    function.
-#' @param beta_mat A beta value matrix for selected methylation samples from a
-#'    450k methylation array with CPG IDs as the row names and sample IDs as
+#'    
+#' @param beta_mat A beta value matrix for methylation samples from a
+#'    450k methylation array with CpG IDs as the row names and sample IDs as
 #'    the column names. An example is given in the \code{betaVals_mat} data set.
-#' @param AclustCPG_df A data frame of beta values and CpG information for
+#' 
+##' @param AclustCPG_df A data frame of beta values and CpG information for
 #'    clusters of CpGs over a 450k methylation array. The rows correspond to the
 #'    CPGs. The columns have information on the cluster number, chromosome,
 #'    cluster start and end locations, and the beta values for each subject
 #'    grouped by some clinical indicator (e.g. case v. control). An example is
-#'    given in the \code{startEndCPG_df} data set.
+#'    given in the \code{startEndCPG_df} data set. This file also has information on true status of the clusters, via variable \code{status}, 
+#'    with values "positive" or "negative", indicating whether treatment effect was added to the cluster.
+#'    
 #' @param verbose Should the function print progress messages? Defaults to
 #'    \code{TRUE}.
 #'
-#' @return A data frame of model fit statistics for the ProbeLasso method under
-#'    each of the given parameter combinations to the data generated for each
-#'    design configuration
-#'
+#' @return A data frame of model performance measures for the ProbeLasso method under
+#'    each of the given parameter combinations applied to the data generated with different treatment effects 
+#'    
+#'  
 #' @export
 #'
 #' @examples
