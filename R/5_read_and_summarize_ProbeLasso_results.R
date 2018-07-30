@@ -90,7 +90,7 @@ ProcessProbeLassoResults <- function(resultsDir,
     delta <- designPts_mat[i, 2]
 
     treatment_ls <- SimulateData(beta_mat = beta_mat,
-                                 AclustCPG_df = AclustCPG_df,
+                                 Aclusters_df = AclustCPG_df,
                                  delta_num = delta,
                                  seed_int = seed)
     trueClusters_df <- treatment_ls$simAclusters_df

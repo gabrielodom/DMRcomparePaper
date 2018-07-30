@@ -107,7 +107,7 @@ WriteBumphunterResults <- function(beta_mat,
     seed  <- designPts_mat[i, 2]
 
     treatment_ls <- SimulateData(beta_mat = beta_mat,
-                                 AclustCPG_df = Aclusters_df,
+                                 Aclusters_df = Aclusters_df,
                                  delta_num = delta,
                                  seed_int = seed)
     betas_df <- treatment_ls$simBetaVals_df

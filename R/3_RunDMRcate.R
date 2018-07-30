@@ -63,7 +63,7 @@
 #'    data("startEndCPG_df")
 #'
 #'    treat_ls <- SimulateData(beta_mat = betaVals_mat,
-#'                             AclustCPG_df = startEndCPG_df,
+#'                             Aclusters_df = startEndCPG_df,
 #'                             delta_num = 0.4,
 #'                             seed_int = 100)
 #'    class_fct <- factor(c(rep("Tumor", 7), rep("Normal", 7)))

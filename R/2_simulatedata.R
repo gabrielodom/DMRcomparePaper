@@ -24,12 +24,12 @@
 #' @param seed_int The seed value passed to the \code{\link[base]{Random}}
 #'    function to enable reproducible results
 #'    
-#' @param betaCols_idx The column numbers of the \code{AclustCPG_df} data frame
+#' @param betaCols_idx The column numbers of the \code{Aclusters_df} data frame
 #'    in which beta values for each subject are stored. 
 #'    
 #' @param numEx_int The number of samples in the first group. This
 #'    function assumes that samples in one group are contiguous columns of the
-#'    \code{AclustCPG_df} data frame.
+#'    \code{Aclusters_df} data frame.
 #'    
 #' @param numClusters_int The total number of randomly selected clusters, for
 #'    which the treatment effect, \code{delta_num}, is then added
@@ -54,11 +54,11 @@
 #'    data("betaVals_mat")
 #'
 #'    SimulateData(beta_mat = betaVals_mat,
-#'                 AclustCPG_df = startEndCPG_df,
+#'                 Aclusters_df = startEndCPG_df,
 #'                 delta_num = 0.4,
 #'                 seed_int = 12345)
 #' }
-SimulateData <- function(beta_mat, AclustCPG_df,
+SimulateData <- function(beta_mat, Aclusters_df,
                          delta_num, seed_int,
                          betaCols_idx = 9:22,
                          numEx_int = 7, numClusters_int = 500){
@@ -68,11 +68,11 @@ SimulateData <- function(beta_mat, AclustCPG_df,
   set.seed(seed_int)
 
   # randomly pick numClusters_int clusters
-  clusts_int <- AclustCPG_df$Clusternumber
+  clusts_int <- Aclusters_df$Clusternumber
   randClusts_int <- sample(max(clusts_int), numClusters_int)
 
   # full data info of randomly picked clusters
-  inflateClust_df <- AclustCPG_df[which(clusts_int %in% randClusts_int), ]
+  inflateClust_df <- Aclusters_df[which(clusts_int %in% randClusts_int), ]
   bval_mat <- as.matrix(inflateClust_df[, betaCols_idx])
 
 
@@ -110,7 +110,7 @@ SimulateData <- function(beta_mat, AclustCPG_df,
   ###  The other clusters  ###
   # Full data info of remaining CPGs, i.e. except randomly picked clusters
   nonInflateClust_df <-
-    AclustCPG_df[!(rownames(AclustCPG_df) %in% inflateClust_df$cpg), ]
+    Aclusters_df[!(rownames(Aclusters_df) %in% inflateClust_df$cpg), ]
   nonInflateClust_df$actual <- "negative"
 
   # Full data info (beta values) of remaining CPGs, i.e. except randomly picked
@@ -122,7 +122,7 @@ SimulateData <- function(beta_mat, AclustCPG_df,
   ###  Combine Treated and Untreated Clusters  ###
   # Combine the CPGs (belonging to selected clusters) and remianing cpgs
   #   (belonging to non-selected clusters)
-  treatedAclustCPG_df <- rbind(inflateClust_df, nonInflateClust_df)
+  treatedAclusters_df <- rbind(inflateClust_df, nonInflateClust_df)
   # Combine the treated (delta-value added) CPGs (belonging to the clusters
   #   selected at random) and untreated (delta-value not added) CPGs (belonging
   #   to the non-selected clusters)
@@ -131,17 +131,17 @@ SimulateData <- function(beta_mat, AclustCPG_df,
 
   ###  Order Columns and Rows  ###
   # Reorder the 'actual' column to previous of beta values
-  treatedAclustCPG_df <- as.data.frame(treatedAclustCPG_df)
-  impVars_df <- treatedAclustCPG_df[c("Clusternumber", "cpg", "CHR", "MAPINFO",
+  treatedAclusters_df <- as.data.frame(treatedAclusters_df)
+  impVars_df <- treatedAclusters_df[c("Clusternumber", "cpg", "CHR", "MAPINFO",
                                       "start_position", "end_position",
                                       "coordinate_37", "chromosome", "actual")]
-  otherVars_df <- treatedAclustCPG_df[setdiff(names(treatedAclustCPG_df),
+  otherVars_df <- treatedAclusters_df[setdiff(names(treatedAclusters_df),
                                               names(impVars_df))]
-  treatedAclustCPG_df <- cbind(impVars_df, otherVars_df)
+  treatedAclusters_df <- cbind(impVars_df, otherVars_df)
 
   # Reorder the rows (CPGs) according to clusternumber
   treatedAclustCPGordered_df <-
-    treatedAclustCPG_df[order(treatedAclustCPG_df$Clusternumber), ]
+    treatedAclusters_df[order(treatedAclusters_df$Clusternumber), ]
 
   if (delta_num == 0) {
     treatedAclustCPGordered_df$actual <- "negative"
