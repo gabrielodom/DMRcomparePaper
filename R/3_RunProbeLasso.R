@@ -11,7 +11,8 @@
 #'    
 #' @param labels_fct A factor vector of subject class labels. These should
 #'    match the observations contained in the columns of the \code{betaVals_mat}
-#'    matrix. Defaults to \code{factor(c(rep("Tumor", 7), rep("Normal", 7)))}
+#'    matrix. Defaults to seven \code{"Tumor"} followed by seven \code{"Normal"}
+#'    samples.
 #'    
 #' @param cpgLocation_df An annotation table that indicates locations of CpGs.
 #'    This data frame has CPG IDs as the rows with matching chromosome and
@@ -37,11 +38,11 @@
 #'    function), then this argument is passed to the \code{cores} argument of
 #'    the \code{\link[ChAMP]{champ.DMR}} function.
 #'    
-#' @param dmr.sig.threshold Regions with DMR p-value less than \code{dmr.sig.threshold}
-#'  are selected for the output 
+#' @param dmr.sig.threshold Regions with DMR p-value less than
+#'    \code{dmr.sig.threshold} are selected for the output 
 #'    
-#' @param min.cpgs Minimum number of CpGs. Regions with at least \code{min.cpgs} are selected for the output.
-#'     Defaults to 5.
+#' @param min.cpgs Minimum number of CpGs. Regions with at least \code{min.cpgs}
+#'    are selected for the output. Defaults to 5.
 #'
 #' @return A list of two elements: a data frame of \code{champ.DMR} results and
 #'    the computing time for the ProbeLasso method.

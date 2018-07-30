@@ -10,9 +10,11 @@
 #'    
 #' @param labels_fct A factor vector of subject class labels. These should
 #'    match the observations contained in the columns of the \code{betaVals_mat}
-#'    matrix. Defaults to \code{factor(c(rep("Tumor", 7), rep("Normal", 7)))}
+#'    matrix. Defaults to seven \code{"Tumor"} followed by seven \code{"Normal"}
+#'    samples.
 #'    
-#' @param chromos_char A character vector for the chromosomes on which the CpGs are located
+#' @param chromos_char A character vector for the chromosomes on which the CpGs
+#'    are located
 #' 
 #' @param chromPosit_num A numeric vector for the locations of the CpGs
 #' 
@@ -22,9 +24,11 @@
 #'     - the CpG ID; \code{chr} - the chromosome label; and \code{MAPINFO} -
 #'    the chromosome location. An example is given in the \code{cpgLocation_df}
 #'    data set.
+#'    
 #' @param pickCutoffQ_num The quantile used for picking the cutoff using the
 #'    permutation distribution, passed to the \code{\link[bumphunter]{bumphunter}}
 #'    function.
+#'    
 #' @param maxGap_int The maximum location gap, passed to the
 #'    \code{\link[bumphunter]{bumphunter}} function. 
 #'    
@@ -37,11 +41,11 @@
 #'    one less than the number of cores available on your machine, as detected
 #'    via the \code{\link[parallel]{detectCores}} function.
 #'    
-#' @param dmr.sig.threshold Regions with DMR p-value less than \code{dmr.sig.threshold}
-#'  are selected for the output. 
+#' @param dmr.sig.threshold Regions with DMR p-value less than
+#'    \code{dmr.sig.threshold} are selected for the output. 
 #'    
-#' @param min.cpgs Minimum number of CpGs. Regions with at least \code{min.cpgs} are selected for the output.
-#'     Defaults to 5.
+#' @param min.cpgs Minimum number of CpGs. Regions with at least \code{min.cpgs}
+#'    are selected for the output. Defaults to 5.
 #'
 #' @return A list of two elements: a data frame of \code{bumphunter} results
 #'    and the computing time for the bumphunter method.

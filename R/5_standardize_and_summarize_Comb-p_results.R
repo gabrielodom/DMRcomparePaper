@@ -15,9 +15,10 @@
 #'    CPGs. The columns have information on the cluster number, chromosome,
 #'    cluster start and end locations, and the beta values for each subject
 #'    grouped by some clinical indicator (e.g. case v. control). An example is
-#'    given in the \code{startEndCPG_df} data set. 
-#'    This file also has information on true status of the clusters, via variable \code{status}, 
-#'    with values "positive" or "negative", indicating whether treatment effect was added to the cluster.
+#'    given in the \code{startEndCPG_df} data set. This data set also has
+#'    information on true status of the clusters, via variable \code{status}, 
+#'    with values "positive" or "negative", indicating whether treatment effect
+#'    was added to the cluster.
 #' 
 #' @param cpgLocation_df An annotation table that indicates locations of CpGs.
 #'    This data frame has CpG IDs as the rows with matching chromosome and
@@ -26,17 +27,18 @@
 #'    the chromosome location. An example is given in the \code{cpgLocation_df}
 #'    data set.
 #'    
-#' @param dmr.sig.threshold Regions with DMR p-value less than \code{dmr.sig.threshold}
-#'  are selected for the output. 
+#' @param dmr.sig.threshold Regions with DMR p-value less than
+#'    \code{dmr.sig.threshold} are selected for the output. 
 #' 
-#' @param min.cpgs Minimum number of CpGs. Regions with at least \code{min.cpgs} are selected for the output.
-#'     Defaults to 5.
+#' @param min.cpgs Minimum number of CpGs. Regions with at least \code{min.cpgs}
+#'    are selected for the output. Defaults to 5.
 #'    
 #' @param verbose Should the function print progress messages? Defaults to
 #'    \code{TRUE}.
 #'
-#' @return A data frame of model performance measures for the Comb-p method under
-#'    each of the given parameter combinations applied to the data generated with different treatment effects 
+#' @return A data frame of model performance measures for the Comb-p method
+#'    under each of the given parameter combinations applied to the data
+#'    generated with different treatment effects 
 #'    
 #'
 #' @export
